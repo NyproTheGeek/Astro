@@ -11,34 +11,36 @@ MULTILINE COMMENTS
 		And I Rock.
 	=#
 
-VARIABLE DECLARATION & DEFINITION
-	var a # unitialized variable declaration.
+SUBJECT DECLARATION & DEFINITION
+	var a # unitialized subject declaration.
 
-	# var is used for variables whose values can change.
-	# let is used for variables whose values cannot change.
+	# var is used for subjects whose values can change.
+	# let is used for subjects whose values cannot change.
 
-	let b = 5 # covariant variable declaration.
-	let c =: 'OroboGenius' # dynamic variable declaration.
-	let d # uninitialized dynamic variable.
+	let b = 5 # covariant subject declaration.
+	let c =: 'OroboGenius' # dynamic subject declaration.
+	let d # uninitialized dynamic subject declaration.
 
-	var Ω = 5, δ = 6 # multiple variable definition.
+	var Ω = 5, δ = 6 # multiple subject definition.
 	let x, y, z
 
 ASSIGNMENT
-	let pi & π = 3.14159265359 # initialize 'pi' and 'e' to the same value
+	let pi & π = 3.14159265359 # initialize 'pi' and 'π' to the same value.
 	let pi, π = getPi() # both are assigned to the same value, if
-	# expression is tuple, both are assigned respectively to each variable.
+	# expression is tuple, both are assigned respectively to each subject.
 
 	func name(n = Str): name_ = n
+	var age = 5
 
-	let age = 5
+	# subjects are callables too
+	# and functions can in turn use assignment operator
+	age = 5 ; name = 'Barney'
+	age(5) ; name('Barney')
+	age 5 ; name 'Barney' # using bracketless call
 
-	name('Barney')
-	name = 'Barney'
-	# objects have default callables that is same as ordinary assigment.
-
-	age(5)
-	age = 5
+CONSTANTS
+	let b; b = 56
+	let d = Int; d = 10 # error!
 
 FUNCTION DEFINITION (1)
 	func add(var a, b):
@@ -59,15 +61,29 @@ EXPRESSION-ORIENTED
 	..
 	nypro.hieght = add(aditya.height, -tripleo.height)
 
+	# a semi-colon at the end of a block, stops it from returning its evaluated
+	# result
+	func setName(var p = Person, var name = Str):
+		p.name = name;
+	..
+
+	let john = setName('John Smith') # error! setName returns no result.
+
+
 SPECIFYING TYPES
 	var number = 5
-	let salary = Pay # uninitialized
-	salary = (5_000, 12) # deferred construction
-	var task = Str('Create a programming language') # initialisation
-	var identification = Str|Int # optional types.
-	var address = Int = 506 # type specification and assignment
-	let task = Str # uninitialized
-	let job = Str() # calling a no-argument constructor must be accompanied by brackets
+
+	let salary = Pay # default costruction.
+	salary = Pay(5_000, 12) # deferred construction.
+
+	var task = Str('Create a programming language')
+	var identifier = Str|Int # optional type specification.
+	# identifier is currently uinitialized.
+	identifier = 'Book'
+
+	var address = Int = 506 # initialization
+	let job = Str() # default costruction.
+	let task = Str # same as above
 
 BUILT-IN TYPES
 	# NOTE: Built-in types are much more than these.
@@ -90,23 +106,30 @@ VALUES & REFERENCES
 	var pointer = ref number # passing a primitive object by reference.
 
 	# Astro uses reference counting to manage memory, unlike Python or
-	# Javascript (garbage collection), as a result, there are times when
+	# Javascript (tracing GC), as a result, there are times when
 	# cyclic reference occurs and needs to be resolved.
 	# 'wref' is used to break such cycle.
 	myCompany.affiliate = ref yourCompany
 	yourCompany.affiliate = wref myCompany
 
+	jeans = def trousers # def uses the default type of passing
+
 	let myAccount = iso Account('Nypro')
-	# iso means only the variable can hold a reference to the object.
+	# iso means only the subject can hold a reference to the object.
+
+	let player = wref team.player
+
+	# you can specify a dynamic subject reference beforehand
+	let library iso
 
 	func getAmount():
 		rt rd amount
 	# 'rd' means an object is passed by reference, but it cannot be written to,
 	# only read from.
 
-	func swap!(a = ref, b = ref):
-		a, b = b, a
-	# you can specify if an argument takes a reference or value (copy).
+	func swap!(var a ref, var b ref):
+		a, b = b, a;
+	..
 
 NUMBERS
 	var index = 5
@@ -118,14 +141,14 @@ NUMBERS
 	var interest = 0o566768 # oct
 
 ACCESS MODIFIERS
-	var money = 0 # variables, functions, types, etc. are public by default.
+	var money = 0 # subjects, functions, types, etc. are public by default.
 	var `laptopModel = 'HP Pavilion' # private to a module.
 
 	# hidden functions and fields are accessible only by a type's methods and fields
 	func .sub(a & b = Num): a + b
 
 ACCESS MODIFIER BLOCK
-	# you can also define a modifier block, where variables, functions, etc.
+	# you can also define a modifier block, where subjects, functions, etc.
 	# within the block share the block's modifiers.
 	mod let `:
 		kmPerMiles = 1.61
@@ -136,20 +159,25 @@ ACCESS MODIFIER BLOCK
 	..
 
 READ-ONLY/WRITE-ONLY ACCESS MODIFIERS # @INC
-	rd, wr
 	var wr `keep = []
+	let rd pi = 3.14
 
 TUPLES
-	var name, age = 'Emeka Okorafor', 27
+	var name, age = 'Emeka Okorafor', 27 # this is an open tuple
 	name, age = age, name
+
+	var game = ('Uncharted 4', 2016) # this is a closed tuple
+
 	let index, car = 15, ('Ferrari', 1995) # car is a tuple.
 
+	let map = () # empty tuple
+
 	# named tuple
-	let http200Status = statusCode => 200, description => 'Ok'
+	let http200Status = statusCode:200, description:'Ok'
 
 PROPERTIES
 	# properties provide getter/setter behavior, so that implementation
-	# of a variable can be flexible.
+	# of a subject can be flexible.
 	var attribute =
 		set hieght:
 			attribute = hieght * 2
@@ -162,15 +190,16 @@ PROPERTIES
 		var pin value; value = hieght * 2
 
 	func attribute:
-		rt $:attribute(Any).value
+		rt {attribute$ Any}.value
 
 	var name, attribute = 'Daniel Olaniyan', 4.8
 
 LISTS
-	var unorderedList = []
-	unorderedList = [7, 3, 8, 5, 4, 0, 9, 1, 2, 6]
+	var unorderedList = [7, 3, 8, 5, 4, 0, 9, 1, 2, 6]
 
-	var contestants = Str['Steve', 'Aditya', 'Sizwe', 'Pierre']
+	var names = [] # empty list
+
+	var contestants = |Str|['Steve', 'Aditya', 'Sizwe', 'Pierre']
 
 	# Astro uses 1-based indexing, so every list indices start at 1.
 	var disqualified = contestants[mid:last] # 1st index to the 3rd index.
@@ -178,26 +207,26 @@ LISTS
 	var reversed = contestants[-1:] # -1 is the 1st index from behind, i.e. the last index.
 	# [-1:] means the last index to the 1st index.
 
-	let myGarage = Car[('Mustang'), ('Eleanor'), ('Bugatti'), ('Lamborghini')]
+	reversed[2] # when indexing a list, there shouldn't be any space between
+	# the subject identifier and the open (square) bracket.
 
-	let yearSalary = 12 Int[] # you can specify a static size for the list.
+	let myGarage = |Car|[('Mustang'), ('Eleanor'), ('Bugatti'), ('Lamborghini')]
+
+	let yearSalary = |12 Int|[] # you can specify a static size for the list.
 
 	yearSalary[1:3] = [2_000, 2_000, 2_500] # you can assign to a range of indices.
 
-	var matrix = 2*2 [
+	var matrix = |2*2|[
 		[1, 0],
 		[0, 1]
 	]
 	var column2 = matrix[1:,2] # Content on row 1 to end, on column 2.
 
-	var matA = 2*3[,]
+	var matA = |2*age|[,] # 2 rows with unknown column length
 
-	# Astro differentiates between row-major ordering and column-major ordering.
-	# Row-major-ordered lists are separated by commas, column-major-ordered ones are not.
-	# This implementation is mostly useful for mathematically-oriented developers.
 	matA[:,:] = [
-		[1 6 3] # this may clash with list declaratio, e.g 3 * 2 Int []
-		[3 7 4]
+		[1, 6, 3],
+		[3, 7, 4]
 	]
 
 	let subset = mat4[1:, 1:2]
@@ -205,46 +234,63 @@ LISTS
 	# vectorised operations
 	var matA = matB *. matC # dot here signifies an element-wise operation.
 
+	# Astro's lists are by default, row-major order, but you can make it
+	# column major by using the transpose operator
+	let y = [1, 2, 3]
+	# 1 2 3
+
+	let z = [1, 2, 3]@
+	# 1
+	# 2
+	# 3
+
+	let x = y[:2]@
+
+	# splatting a list
+	let a = [
+		[1, 2]
+		[0, 4]
+	]@
+	# 1 0
+	# 2 4
+
+	# splatting a list exposes the content of the matrix as an open tuple
+	# splatting a returns a 2-dimensional open tuple.
+	let b = [
+		[...a, ...a@]
+		[...a@, ...a]
+	]
+	# 1 0 1 2
+	# 2 4 0 4
+	# 1 2 1 0
+	# 0 4 2 4
+
+
 DICTIONARIES
 	# dictionaries are basically key-value lists.
 	let testScores = [
-		'class room 1'=>[0, 15, 30, 15, 76, 50]
-		'class room 2'=>[45, 50, 83, 9, 39, 81]
+		'class room 1': [0, 15, 30, 15, 76, 50],
+		'class room 2': [45, 50, 83, 9, 39, 81]
 	]
 	var class1Scores = testScores['class room 1']
 	# keys can also be quoted like strings
 
+	var contacts = [:] # empty dictionary
 
-GENERRATORS & RANGES # @INC
-	# generators return some value when their next method is called.
-	var x = thru list
-
-	# meanwhile yield coroutines are also classified as generators
-	func genRandInt():
-		yd Int{rand()}
-
-	# ranges are special type of generators that can be indexed.
-	var zeroToTen = 0:10 # zeroToTen becomes a range.
-
-	# it is usually a good idea to enclose ranges in brackets to
-	# prevent ambiguity with block begin punctuator
-	var alphabets = 'a':'Z'
-
-	# when a range is packed within square braces, it becomes a list.
-	var numberList = [1:5]
-	var evenNum = 2:2:20[10]
-
-	var normalizedList = [0.0:1.0]
+OTHER TYPES OF LISTS
+	var range = {0:20} # range is a type of list
+	var indexer = list[1:] # indexer is a type of list.
+	# it holds ref to a subset of another list
 
 PACKING & UNPACKING
-	var range = 0:20
-	var list = [0:20] # [ ] turns a range, generator or tuple to a list.
-	var tuple = ...list # ... turns a range, generator or list to a tuple.
-	var generator = thru list # thru turns a range, tuple or list to a generator.
-	var indexer = list[1:] # an indexer holds a reference to a subset of a list.
+	var list = [{0:20}] # [ ] turns a generator or tuple to a list.
+	var tuple = ...list # ... turns a generator or list to a tuple.
+	var dict = [tuple:] # [:] turns a tuple to a table.
+
 	let primes = [2, 3, 5, 7, 11]
 	let numbers = [2, 4, 8, ...primes]
-	func sum(...args = Real): args .fold :$1 + $2
+
+	func sum(...args = Real): args .fold => $1 + $2
 
 STRINGS
 	let language = 'Astro'
@@ -276,7 +322,6 @@ STRINGS
 	'Hello,' +
 	'World!'
 
-
 MULTILINE EXPRESSIONS # @INC
 	# expressions that spread accross multiple lines must be enclosed in brackets
 	# or used with a back slash ending the previous line.
@@ -303,13 +348,14 @@ MULTILINE EXPRESSIONS # @INC
 		.strip!()
 		.reverse!()
 
-SANDWICHED EXPRESSIONS
+SANDWICHED STATEMENTS
 	var faveSoccerClub =
 	(game == 'Manchester United' ? println('You suck!'); game)
 
 	# you can sandwich multiple expressions where a single expression is expected.
 	# by putting them in brackets.
 	println('Hello, ', (println('World'); '!'))
+	var add = ()
 
 IF STATEMENT
 	if isAdrianRich:
@@ -334,9 +380,16 @@ IF STATEMENT
 	if copy = getCopy():
 		println(copy)
 
-	if !x & !y & !z:
+	if not x & not y & not z:
 		x = 25; y = 5; z = 2
 	..
+
+	# nested if statements can be written together with their corresponding
+	# else statements stacked accordingly
+	if tim.age > 16 if car.state == 'good':
+		tim.drive car
+	else: throw Ex 'Driver must over the age of 16'
+	else: throw Ex 'Car is in bad state. Repair immediately!'
 
 NIL
 	# sometimes, it is important to represent an empty or missing state, this can be
@@ -345,22 +398,27 @@ NIL
 	var program = Str|Nil = 'println \"Hello World\"'
 	var anotherProgram = Str~ = nil
 
-	# a nullable cannot be assigned to a non-nullable variable without a proper
-	# null coalescing with a fallback value.
-	var programList = Str[]~
-	var cartoonList = Str[]
-	cartoonList = programList ~ []
+	# a nilable cannot be assigned to a non-nullable subject without a proper
+	# nil coalescing with a fallback value.
+	var programList = Str~
+	var cartoonList = |Str|[]~
+	cartoonList = programList?||[]
+	let profile = server
+		.user('Name')~{Account 'default'}
+		.profile~{Profile 'default'}
 
 	# using the coalescing operator, you can specify what expression gets evaluated
 	# if an expression returned nil.
-	var account = remote.account('Deadpool') ~ 0 # if account returns nil, assign 0 instead.
+	var account = remote.account('Deadpool')?||0 # if account returns nil, assign 0 instead.
 
-	var nypro = search('Nypro') ~ println('Nypro does not exist!')
+	var nypro = search('Nypro')?||println('Nypro does not exist!')
 
 	if feeds: println('no feeds') # = if feeds equals nil or false.
 
 	if isRecieving == nil:
 		println('remote server stopped recieving')
+
+	let john = Person dave~.name # unwrapping a nilable obbject
 
 CONDITIONS
 	# Astro discourages reptition in conditional expression.
@@ -371,74 +429,80 @@ CONDITIONS
 	if x and y == z: runTask() # if both x and y equals z.
 	if x == y == z: runTask()
 
-	if x == y & y < z: runTask() # deprecation warning!
-	if x == y and < z: runTask() # if x equals y and also greater than z.
+	if x == y | y < z: runTask() # deprecation warning!
+	if x == y or < z: runTask() # if x equals y and also greater than z.
 
 	if x == y & a == b: runTask() # no warning
 
+	if x not y: println 'x does not equal y'
+	if x not in list: println 'x is not inside list'
+	if not x:  println 'x is not null'
+	if not isOroboRich: println 'Orobo is not rich'
+	if cat not === Person: println 'cat is not a Person'
+
 FOR LOOP
-	# Astro chooses 'thru' instead of 'in' for iteration.
-	for i thru 1:10:
+	for i in {1:10}:
 		println(i)
+	..
 
 	let interestingNumbers = [
 		'prime' : [2 3 5 7 11 13]
 		'fibonacci' : [1 1 2 3 5 8]
 		'square' : [1 2 4 9 25 36]
 	]
-	for kind, number thru interestingNumbers: # parallel pairing through a dictionary.
+	for kind, number in interestingNumbers: # parallel pairing through a dictionary.
 		println('[kind]: [number]')
 
-	# looping thru a number
-	for num thru 50: num
+	# looping through a number
+	for num in 50: num
 
-	for up, down thru (1:20, 20:1): # parallel pairing through ranges.
-		println('[up] <-> [down]')
+	for up, down in {1:20}, {20:1}: # parallel pairing through ranges.
+		println('[up] <::> [down]')
 
-	for upper thru 1:20 for lower thru 1:20: # @INC # nested iterations through ranges.
-		println('[upper] : [lower]')
+	for upper in {1:20} for lower in {1:20}: # @INC # nested iterations through ranges.
+		println('[upper] -:> [lower]')
 
-	var oddList = [for i thru 1:20 where i % 2 != 0: x] # list comprehension.
+	var oddList = [for i in {1:20} where i % 2 not 0: x] # list comprehension.
 
-	for i thru 1:20:
-		i += 1 # error! immutable variable.
+	for i in {1:20}:
+		i += 1 # error! immutable subject.
 		j = i
 	..
 
-	for var i thru 1:20:
+	for var i in {1:20}:
 		i += 1
 		j = i
 	..
 
-	for _ thru 1:fifty:
+	for _ in {1:fifty}:
 		println 'Hello'
 
-HOLD VARIABLES
-	for color thru colors:
-		var hold i = 1 # a hold variable's state persist for the duration of the loop.
+HOLD SUBJECTS
+	for color in colors:
+		var hold i = 1 # a hold subject's state persist for the duration of the loop.
 		println(i, color); ++i
 	..
 
 	func sum(list):
-		var hold index = 1 # you can also have hold variables for recursive functions.
-		if x.len() < 1:
+		var hold index = 1 # you can also have hold subjects for recursive functions.
+		if x.size() < 1:
 			rt 0
 		else:
 			list[index] + sum(list[++index:])
 	..
 
 LABELS # @INC
-	label class # labels allow you to break out of or next a certain loop.
-	for class thru classes:
-		for student thru students:
+	label class # labels allow you to break out of or continue a certain loop.
+	for class in classes:
+		for student in students:
 			if student.position == 'captain':
 				record.save(student.name)
-				next class
+				continue class
 			..
 		..
 	..
 
-IN & NOT IN
+IN
 	if student.name in defaulterList:
 		println('[student.name] hasn\'t paid yet. Contact parents')
 
@@ -452,10 +516,10 @@ WHERE # @INC
 	# where is used to establish an extensive condition especially where it is
 	# not expected.
 	if person in auditionRoster where person.mark > 40.0:
-		acceptanceList.add(name)
+		acceptanceList.add person
 
-	for book thru library where book.title.contains('adventure'):
-		personalLibrary.add(book)
+	for book in library where book.title.contains('adventure'):
+		personalLibrary.add book
 
 WHILE LOOP & LOOP
 	while file.hasNext():
@@ -477,18 +541,31 @@ WHILE LOOP & LOOP
 	while gen.hasNext()
 
 	while var user = genRandomUser():
-		println('[user.name]')
+		println(user.name)
+
+	while list.size > 0 for name in list:
+		print name, sp
+		list .removeTop
+	..
 
 TERNARY OPERATOR
 	# ternary operator is a summarized if-else clause.
 	var absValue = a > 0 ? a || -a
 
 	# the else part of a ternary operator can be omitted.
-	song in playlist ? playSong()
+	song in playlist ? play playlist[song]
 
 BLOCKS AND LINES
+	# a block represents a scope
+	let country = 'India'
+	block:
+		let country = 'Nigeria'
+		println country # Nigeria
+	..
+	println country # India
+
 	# block structures must be closed with a corresponding end punctuator '..'.
-	for color thru colors:
+	for color in colors:
 		var hold i = 1
 		println(i, color)
 		++i
@@ -511,24 +588,24 @@ BLOCKS AND LINES
 
 FUNCTION DEFINITION (2) # @INC
 	# functions can be optionally annotated with argument types and return types.
-	func mul(a = Int, b = Int)->Int: a * b
+	func mul(a = Int, b = Int) -> Int: a * b
 
 	# arguments next to each other can share an assignment by separating them
-	# with spaces instead of commas.
+	# with '&' instead of commas.
 	func join(var s1 & s2 = Str, joiner = ''):
 		s1 + joiner + s2
 
 	# varargs.
 	func arithMean(...numbers = F64):
 		var total = 0d
-		for number thru numbers:
+		for number in numbers:
 			total += number
 		total / numbers.size
 	..
 
 	# the brackets of a function call maybe ommited, the following tuples will be taken as its argument
 	func greet(): println 'Hello!'
-	func divAll(...nums): nums.fold :$1 / $2
+	func divAll(...nums): nums.fold => $1 / $2
 
 	greet # 'Hello!'
 	divAll 16, 2, 4 # 2
@@ -536,44 +613,58 @@ FUNCTION DEFINITION (2) # @INC
 
 	# the brackets of a named function can be ommitted too.
 	func add a & b: a + b
-	func (a & b):  a + b # an anonymous must always have its brackets
+	func _(a & b):  a + b # an anonymous must always have its brackets
 
-	# states of sticky variables persist between function calls.
+	# states of pinned subjects persist between function calls.
 	func callCount():
-		var sticky count = 0 # @INC
+		var pin count = 0 # @INC
 		println('Call count [count]')
 	..
 
-	# states of hold variables persist through recursive calls.
+	# states of hold subjects persist through recursive calls.
 	func sum(list):
 		var hold index = 1 # @INC
-		if x.len() < 1:
+		if x.size() < 1:
 			rt 0
 		else:
 			list[index] + sum(list[++index:])
 	..
 
 	# functions that change the values of arguments must be annotated with a '!' sign.
-	func swap!(var a & b = ref): a, b = b, a;
+	func swap!(var a & b = ref $T): a, b = b, a;
 	swap!(task1, task2)
 
 	# self always refers to the first parameter.
 	func getDetails(u = User): self.name, self.age
 	func getDetails(): 'Mr Nobody', 0
-	var name, age = getDetails()
-
+	var name, age = getDetails
 	# function objects.
-	var details = $:getDetails # details refer to a generic overload.
-	var details2 = $:getDetails(User) # details2 to a specific overload getDetails(User).
+	var details = getDetails$ # details refer to a generic overload.
+	var details2 = getDetails$ User # details2 to a specific overload getDetails(User).
 
-	var binaryOp = func(Number, Number)->Number
+	var xyz = doSth$(Int, Bool)
+	var abc = {doSth$ Int, Bool} # using bracketless call
+	var binaryOp = (func _ Number, Number -> Number)
 	var initServer = Func
-	var range = func: var i = 1; while i < 11: yd ++i
+	var range = (
+		func _:
+			var i = 1
+			while i < 11: yd ++i
+	)
 
-	# default arguments
-	func add(a = Int, b = 0): a + b
-	add(5, 6)
-	add(5)
+	func greet name, f = (func _ Str -> None): f name
+
+
+	# default parameter values
+	# Unlike most languages, every non-dynamic parameter already has a default value in Astro.
+	func add a = Int, b = Int, c = Int, d = Int: a + b + c + d
+	func add a = Int, b = Int: a + b
+	# parameters a and b are assigned to Int which is a default constructor and returns the value 0
+	@which add 51, 64, 43, 12 # add(Int, Int, Int, Int).
+	@which add 20, 17 # add(Int, Int)
+	@which add 10 # add(Int, Int) # notice! lesser no of arguments.
+	@which add 10,_,_ # add(Int, Int, Int, Int) # notice! lesser no of arguments
+	@which add _,54 # add(Int, Int)
 
 	# keyword arguments
 	func signUp(email, username, password):
@@ -581,23 +672,23 @@ FUNCTION DEFINITION (2) # @INC
 	..
 
 	signUp(
-		username='appcypher',
-		email='appcypher@gmail.com',
-		password='thereare3littleblackbirdssittingonawall'
+		username:'appcypher',
+		email:'appcypher@gmail.com',
+		password:'thereare3littleblackbirdssittingonawall'
 	)
 
-	type Player(name-playerName):
+	type Player(name):
 		var tracker = LevelTracker
-		let playerName = Str
+		let name = Str
 	..
 
-	let rodriguez = Player name='Rodriquez Bastion'
+	let rodriguez = Player name:'Rodriquez Bastion'
 
 	# compulsory named arguments
 	func sendMessage(message & :to-recipient = Str, :shouting = false):
-		println((message + recipient).toUpper)
+		println {message + recipient}.toUpper
 
-	sendMessage 'Hello', to='Cantell'
+	sendMessage 'Hello', to:'Cantell'
 
 	# returning nothing
 	func printFile(fileName):
@@ -606,23 +697,45 @@ FUNCTION DEFINITION (2) # @INC
 		; # an ending colon, stops the function from implicitly returning the last expression.
 	..
 
-INFIX NOTATION
-	func plus(a = Numero, b = Numero): Numero(a.value + b.value)
-	func minus(a = Numero, b = Numero): Numero(a.value - b.value)
-	func sum(...args = Numero): Numero(args.map(add))
+	# _ can also be used as a placeholder for returning nothing
+	func add a, b: a + b; _
 
-	var numero1 = Numero(15)
-	var numero2 = Numero(70)
+BRACKETLESS CALL
+	func plus a = Numero, b = Numero:
+		Numero a.value + b.value
+	func minus a = Numero, b = Numero:
+		Numero a.value - b.value
+	func sum ...args = Numero:
+		Numero args.fold add$
 
-	var numero3 = numero1 .plus numero2 .minus Numero(23) # infix function call
-	var numero4 = numero1 .sum numero2, numero3 # tuple args passed to infix function sum
+	var numero1 = Numero 15
+	var numero2 = Numero 70
 
-	5 .plus 6 .minus 7 == 5.plus(6).minus(7) != 5.plus(6.minus(7))
-	5 .plus (6 .minus 7) == 5.plus(6.minus(7))
+	var numero3 = numero1 .plus numero2 .minus Numero(23) # bracketless function call
+	var numero4 = numero1 .sum numero2, numero3 # tuple args passed to a bracketless
+	# sum
 
-	loop: println('>>>', scan() .lex .parse .compile .interpret)
+	5 .plus 6 .minus 7 == 5.plus(6).minus(7) not 5.plus(6.minus(7))
+	5 .plus (6 .minus 7) == 5 .plus(6 .minus(7))
 
-INFIX VS ELEMENTWISE
+	loop: println('>>>', scanln() .lex .parse .compile .interpret)
+
+	# argument wall using '{' and '}' makes bracketless call possible even more readable
+	profile ->{deleteContact 'Tosin', 'Tunde'} ->changeAvatar '/album/grad/0123.png'
+
+	makeCar make:'Toyota', model:'Sienna', date:{Date 1, 1, 17}
+
+	# argument can only be used with a function or subject with one or more args.
+	play {music 'Jailer', 'Asa'}, speed:'2x'
+	play {music}, speed:'2x' # error! can't use argument wall for bracketless call music.
+
+	println {'Hello' + name}.strip
+	println {+ 'Hello', name}.strip
+	println {'Hello' .+ name}.strip
+
+	getCompany managers, {getCompany 'PZ'}~{getSub 'PZ', kind 'new'}.users, founders
+
+BRACKETLESS CALL VS ELEMENTWISE
 	var mA, mB = rand(5, 5)
 
 	mA + mB
@@ -638,19 +751,40 @@ INFIX VS ELEMENTWISE
 	mA.cross.(mB)
 	mA .cross. mB
 
+CONSECUTIVE CALL CHAIN
+	check(lhs) && ('=') && (rhs)
+
+	println 'Hello' && '[name.isEmpty?'John Doe'||name]' && '!'
+
+	var e = Employee
+	e.setName 'Badmus' && 'Travis' && 'Gabriel'
+
+	# consecutive call chain tupling
+	let tony, barn, rod =
+		list.getPerson 'Anthony', && 'Barney', && 'Rodney'
+
 FUNCTIONS AS ARGUMENTS & LAMBDAS
 	# a function can be passed as an argument.
-	let scoreListWithExtraMarks = scoreList.map(func (score): score + 5)
-	let scoreListWithExtraMarks = scoreList.map(:$1 + 5) # function simplified using lambda
-	let scoreListWithExtraMarks = scoreList.map(:$myFunc)
+	let scoreListWithExtraMarks = scoreList.map(func _(score): score + 5)
+	let scoreListWithExtraMarks = scoreList.map(myFunc$)
+
+	fixtureList .filter game => not game.isCancelled
+	fixtureList .filter => not $1.isCancelled
 
 	# if function being passed is one, the definition of the function can be written
 	# in a do block.
-	var pplBelow25 = census.filter() do person:
+	var pplBelow25 = census.filter do person:
 		person.age < 25
 	..
 
-	var range = func: var i = 1; while i < 11: yd ++i
+	greet 45, =>(
+		println "Hello"
+		println "World"
+	), true
+
+	var f = (func _ name: println 'Hi [name]')
+	var f = name => println 'Hi [name]'
+	func f name: println 'Hi [name]'
 
 CLOSURE
 	# a closure is an inner function.
@@ -659,12 +793,12 @@ CLOSURE
 			rt db.connect(host, username, password) # a closure can be returned.
 		makeDBConection
 	..
-	var dbCallback = genDBConnector(host='localhost', username='nypro', password='willdiearobot')
+	var dbCallback = genDBConnector(host:'localhost', username:'nypro', password:'willdiearobot')
 
 	# nameless closures are executed at point of definition.
 	func basicOps(number):
 		var calc = 0
-		func ():
+		func _():
 			calc += number
 			calc *= number
 			calc /= number
@@ -673,11 +807,11 @@ CLOSURE
 		calc
 	..
 
-OUTER VARIABLES
+OUTER SUBJECTS
 	let state = 'Idle'
 
 	func changeState(state = Str):
-		if state != nil:
+		if state not nil:
 			activateState(state)
 		else:
 			activateState(outer.state) # outer refers to the parent scope.
@@ -687,94 +821,118 @@ COFUNCTIONS # @INC
 	func remove!(var list = [], index = Int):
 		list -= list[index]
 
-	$:remove += $:refreshUI # attaching a cofunction to a generic overload.
+	remove$ += refreshUI$ # attaching a cofunction to a generic overload.
 	emit movieList.remove(2) # emit is used to run the function along with its cofunctions.
 
-	$:remove([], Int) += $:refreshUI # attaching a cofunction to a specific overload.
+	{remove$ List, Int} += refreshUI$ # attaching a cofunction to a specific overload.
 
 USEFUL FUNCTIONS # @INC
 	typeOf(24)
-	len('Hello, world!')
-	var colorAndIndex = [enumerate(colors)]
-	1:20
-		.map(:1 + $1)
-		.filter(:$1 % 2 == 1)
-		.each(:print($1, ', '))
-	printf('The cricumference of a circle with radius 5 is %f', pi * 5^2)
+	size('Hello, world!')
+	var colorAndIndex = [enumerate(colors):]
 
-MATCH STATEMENT / CASES
-	# match statement is switch-case-based function. They can also be used as closures.
-	for char thru chars:
-		match char:
-			# every set of with/where blocks starts with a 'with>' or 'where>'
-			with> '\0': println 'This is a null character'
-			# with, where returns immediately after evaluating block.
-			# spill is used to go to the next with or where
-			where isNumber(char): println 'This is a null character'; spill
-			where isAlphabet(char): println('[char] is ascii')
-			where isHangul(char): println('[char] is hindu')
-			else:
-				println "This is the default block"
-			..
-		..
+	{1:20}
+		.map(=>1 + $1)
+		.filter(=>isPrime $1)
+		.each(=>print($1, ', '))
+
+	numbers.noneMatch => isEven $1
+	printf('The circumference of a circle with radius 5 is %f', pi * 5^2)
+
+USEFUL CONSTANTS
+	nl == '\n'
+	sp == ' '
+	tb == '\t'
+	cm == ', '
+	bk == '\b'
+	pi == 3.1415926535897
+	e == 2.7182818284590
+
+MATCH EXPRESSION & CASE STATEMENT
+	# match statement is like switch-case.=
+	for char in chars:
+		match char
+		# every case statement starts with a 'wit_' or 'cas_' unless there is a top 'match' expression
+		with '\0': println 'This is a null character'
+		# with, case returns immediately after evaluating block.
+		# spill is used to go to the next with or where
+		case isNumber(char): println 'This is a null character'; spill
+		case isAlphabet(char): println('[char] is ascii')
+		case isHangul(char): println('[char] is hindu')
+		case : #= default =# println "This is the default block"
 	..
 
 	let point = 1, -1
-	match point:
-		with> let x, y where x == y:
-			println '([x], [y]) is on the line x == y'
-		with let x, y where x == -y:
-			println '([x], [y]) is on the line x == -y'
-	..
+	match point
+	with let x, y where a == b:
+		println '([x], [y]) is on the line x == y'
+	with let x, y where a == -b:
+		println '([x], [y]) is on the line x == -y'
 
 	func opCodeDispatch(opCode = Str, args = [], var index & result = Int):
 		result = 0
-		# a match statement can be written without its header
-		# this means its taking the tuple of the function as arguments
-		with> 'ADD' : rt result = args[index] + args[++index]
+		# a case statement can be written without a match header
+		# this means its taking the parmeter tuple of the function as arguments
+		# in this case, te case block needs to start with a top
+		# 'wit_' or 'cas_'
+		wit_ 'ADD' : rt result = args[index] + args[++index]
 		with 'SUB' : rt result = args[index] - args[++index]
 		with 'MUL' : rt result = args[index] * args[++index]
 		with 'DIV' : rt result = args[index] / args[++index]
-		with 'EQ' : rt args[index] == args[index+1] ? index += 3 || spill
-		with 'JUMP' or 'SKIP': index += args[index += 2]
-		println('Opcode error!')
+		with 'EQ'  : rt args[index] == args[index+1] ? index += 3 || spill
+		with 'JUMP' or 'SKIP' : index += args[index += 2]
+		println 'Opcode error!'
 	..
 
 COROUTINES # @INC
 	# Astro coroutines are concurrent and similar to goroutines by design.
 	# They are lightweight and can run parallely provided multiple processors.
-	# Coroutines communicate through flo variables only.
+	# Coroutines communicate through flo subjects only.
 
 	func main():
-		# flo is a special type of variable used to pass messages between coroutines
+		# flo is a special type of subject used to pass messages between coroutines
 		flo a, b = Str
 
 		# run keyword starts a coroutine to run concurrently with its caller.
-		run func ():
-			time.sleep(1000)
+		run func _():
+			time.sleep 1000
 			a << 'One' # message passing is done using '<<' and '>>' operators.
 		..
 
-		run func ():
-			time.sleep(1000)
-			b << 'Two' # passes a message to a flo variable.
+		run func _():
+			time.sleep 1000
+			b << 'Two' # passes a message to a flo subject.
 		..
 
-		# select is like a match statement used to check if a flo variable is sending
+		# select is like a match statement used to check if a flo subject is sending
 		# messages to the current function. And if it is the following block is evaluated.
 		select a, b:
-			with> a : println(<< a)
-			with b : println(<< b)
+			wit_ a : println << a
+			with b : println << b
 		..
 	..
 
 	# Astro also has generator functions for simple tasks. This coroutine runs
 	# concurrently, but cannot run parallely.
 	func genRandRange(n = UInt):
-		yd rand().range(n)
+		yd rand().range n
 	..
-	for i thru 1:10:
-		println(generateRandom(10))
+	for i in {1:10}:
+		println(generateRandom 10)
+
+STREAM
+ones.twos.threes.collect
+collect(threes(twos(ones())))
+
+func ones: yd 1
+func twos gen=Generator: yd gen + 2
+func threes gen=Generator: yd gen + 3
+
+func collect gen=Generator:
+    list = []
+    for i in gen: list .append i
+    list
+..
 
 TYPE DEFINITION
 	# types in Astro cannot contain functions. Even the constructors and destructors are
@@ -806,46 +964,46 @@ TYPE DEFINITION
 	var john = Person('John Connor', 23)
 
 	type Lamp(color)
-	var yellowLamp = Lamp('Yellow') # Lamp variable declared with an initialization.
-	var blueLamp = Lamp # Lamp variable declared but not initialized.
+	var yellowLamp = Lamp('Yellow') # Lamp subject declared with an initialization.
+	var blueLamp = Lamp # Lamp subject declared but not initialized.
 	blueLamp.color = 'Blue'
 
 FIELD ACCESS MODIFIERS
 	type Singleton:
 		# hidden fields can only be accessed by type's functions.
-		var hide sticky count = Int = 0
-		# the states of sticky fields persist throughout a type's lifetime, and that's
+		var pin .count = Int = 0
+		# the states of pinned fields persist throughout a type's lifetime, and that's
 		# the program's lifetime.
-		var hide sticky sole = Singleton
+		var pin .sole = Singleton
 		var value = Int
 	..
 
-	func hide Singleton():
+	func .Singleton():
 		if self.count == 0:
 			++count
-			rt sole = new(value)
+			rt self.sole = new value
 		..
-		sole
+		self.sole
 	..
 
 	func Singleton(value = Int):
-		var x = Singleton()
+		var x = Singleton
 		x.value = value
 	..
 
 TYPE EXTENSION
 	type Programmer(specializedLanguages) <: Person:
-		let languages = Str[]
+		let languages = |Str|[]
 
 	func main:
 		let orobogenius = Programmer
-		steve.languages = ["Java", "PHP", "JavaScript"]
+		orobogenius.languages = ["Java", "PHP", "JavaScript"]
 
 		# type extension is limited to its scope
 		extend Programmer <: WorkingPerson:
-			let philosophies = Str[]
+			let philosophies = |Str|[]
 
-		let appcypher = Programmer(["Astro", "Java", "C++", "Python"])
+		let appcypher = Programmer ["Astro", "Java", "C++", "Python"]
 		appcypher.philosophies = ["Open Source", "Futurism", "Transhumanism"]
 	..
 
@@ -887,9 +1045,9 @@ INHERITANCE # @INC
 	func baz(x = X, b = B):
 		baz(x, A <- b)
 
-	type Person(var name, age)
+	type Person(var name & gender = Str, age = Int)
 
-	type Employee(var job, company)<: Person
+	type Employee(var job & company = Str)<: Person
 
 	func Employee(name, age, job, company):
 		new(Person(name, age), job, company) # construction merging.
@@ -897,6 +1055,11 @@ INHERITANCE # @INC
 	func Employee(name, age, job, company):
 		new(super(name, age), job, company) # construction merging.
 
+	func print p = Person: print p.name, p.age
+	func print e = Employee:
+		super.print # or print super <- e
+		print sp, e.job, e.company
+	..
 
 ABSTRACT TYPES & FUNCTIONS # @INC
 	type ab Player # abstract types cannot be instantiated.
@@ -920,65 +1083,89 @@ ABSTRACT TYPES & FUNCTIONS # @INC
 	type Node(l = Leaf, r = Tree) <: Tree
 
 	func sum(t = Tree):
-		with> Leaf: t.value
+		wit_ Leaf: t.value
 		with Node: sum(t.l) + sum(t.r)
 	..
-	using Tree: .
+
+	using Tree: _
 	var x = Node(Leaf(1), Node(Leaf(2), Leaf(3)))
-	hiding Tree: .
+	hiding Tree: _
 
-ANONYMOUS OBJECTS # @INC
-	# an anonymous object is a singleton of an ad hoc type definition
+ANONYMOUS TYPES # @INC
+	# an anonymous type is a singleton with an ad hoc type definition.
 	# which include the type's fields and functions.
-
 	(type(state) <: Thread:
 		var state = 'Paused'
-	func start:
-		println('Thread: [state]')
+	func start var ?:
+	# the '?' here represents an object of the anonymous type
+		println('Thread: [self.state]')
 	)('Working')
 
 TYPE CHECKING
-	if myCar =: Car:
+	if myCar =:: Car:
 		println('myCar is a Car')
 
-	if myCar == Car:
+	if myCar === Car:
 		println('myCar is a Car or its subtype')
+
+	if myCar =<: Car:
+		println('myCar is a supertype of Car')
 
 	if myCar =>: Car:
 		println('myCar is a supertype of Car')
 
-	if phone != Phone:
-		println("phone is not a Phone")
+REFERENCE CHECKING
+	let a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+	let b = a[1:4]
+	let c = val a[1:4]
+	a =:= b # true
+	a =:= c # false
+	(one =:= other) == (one.ref == other.ref) # true
 
 FUNCTION == METHODS (UFCS)
 	func show(p = Person):
 		println(self.name, self.age)
+	..
 
-	show(nigel)
+	show nigel
 	# In Astro, a function is a method of its first argument.
-	nigel.show()
+	nigel.show
 
 	# The only two set of functions that cannot be used with dot operator are
 	# contructor functions and new functions.
 	type Robot:
 		var name, uniqueID
+	..
 
 	func Robot(name, uniqueID):
 		new(name, uniqueID)
+	..
 
 	var walle = Robot('Wall-E', 215)
 
 
-METHOD CHAINING
-	# returned object function chain.
+CALL CHAINING
+	# return chain.
 	var result = 8.plus(6).minus(4).times(2)
 
-	# returned object forwarding.
-	buffer .resize!(13) .fill!(0, _)
-
-	# tail object function chain.
+	# tail object chain
 	# a convenience syntax in which the intial associated object is returned to.
 	profile->open()->deleteMsgs()->close()
+
+	# returned object forwarding.
+	buffer ->resize!(13) ->fill!(0, $$)
+
+	# consecutive call chain
+	var e = Employee
+	e.setName 'Badmus' && 'Travis' && 'Gabriel'
+	e.setName 'Badmus'; e.setName 'Travis'; e.setName 'Gabriel'
+
+	# chain tupling
+	var name, version = haskell ->name, ->version
+	var first, second = 8 + 1, + 45
+	let tony, barn, rod =
+		list.getPerson 'Anthony', && 'Barney', && 'Rodney'
+
 
 COVARIANCE  # @INC
 	type Person(name, age)
@@ -986,13 +1173,13 @@ COVARIANCE  # @INC
 	type Teacher(super(name, age), course) <: Person
 
 	func show(p = Person): # a covariant parameter can take a subtype too.
-		println(p.name, p.age)
+		println p.name, p.age
 
-	show(Person('Tony Stark', 36))
-	show(Employee('Peter Parker', 17, 'Photographer'))
-	show(Teacher('Diana Lane', 12, 'Biology'))
+	show Person('Tony Stark', 36)
+	show Employee('Peter Parker', 17, 'Photographer')
+	show Teacher('Diana Lane', 12, 'Biology')
 
-	var people = Person[Teacher(), Employee(), Employee(), Tecaher()] # a covariant list.
+	var people = |Person|[Teacher(), Employee(), Employee(), Teacher()] # a covariant list.
 
 IMPLICIT CONVERSION
 	# Astro casts primitive between types implicitly.
@@ -1002,17 +1189,21 @@ IMPLICIT CONVERSION
 	0 == 0.0 # = true
 
 TYPE CASTING
-	var radianInt=Int{2*pi} # the resulting value Float of 2*pi is casted to Int.
+	var radianInt = Int(2 * pi) # the resulting value Float of 2*pi is casted to Int.
 
 	# overloading a cast function.
-	func __cast(emp=Type{Employee}, pers=Person):
+	func Employee(pers=Person):
 		Employee(pers.name, pers.age)
+	..
 
 	var deitel = Person('Paul Deitel', 57)
-	var editor = Employee{dietel}
+	var editor = Employee dietel
 
-	var yearStr = Str{1990}
-	let sorted = Int{yearStr.sort!}
+	var yearStr = Str 1990
+	let sorted = Int yearStr.sort!
+
+	func MyInteger num = F64: new {Int num}
+	let cost = {MyInteger price} * qty
 
 NAME ALIASES
 	Float as Meter
@@ -1020,8 +1211,6 @@ NAME ALIASES
 	myIncrediblePlaylistOfSongs as playList
 
 MODULES AND IMPORTS
-	module algebra
-
 	import math
 	let piInverse = 1 / Math.pi
 
@@ -1033,24 +1222,25 @@ MODULES AND IMPORTS
 		chebyshevCoefficient as chebCoef
 	..
 
-	import math: . # imports all components from a module to be used directly
+	import math: .all
+	import json: .vars, .lets, .funcs, .types
 
 GENERICS # @INC
-	func add(a b c = $T): # declaring a generic type T.
+	func add(a & b & c = $T): # declaring a generic type T.
 		var d = T
 		d = a + b + c
 	..
 
-	var sum = add{Int}(2, 4, 6)
+	var sum = add{Int} 2, 4, 6
 	# if the generic parameter can be readily inferred, then a type argument
 	# can be ommited.
 	var sum = add(2, 4, 6)
 
 	type MyList:
-		var list = $T[]
+		var list = |$T|[]
 
 	# a function can use the generic type of any of its parameters' types.
-	func append(ml = MyList, item = $T(ml)):
+	func append(ml = MyList, item = $T[ml]):
 		self.list += item
 
 	let parent = $S<:Bone # generic type S where S is a subtype of Bone.
@@ -1060,38 +1250,40 @@ GENERICS # @INC
 	var image = $U::Image{T} # generic type U is exactly Image{T}.
 
 	func hello(msg = $T):
-		if T != Str:
+		if T not Str:
 			println('wrong type, [T]')
 		else:
 			println('hello, [msg]')
 	..
 
+	var x = 10
+	let y = $[x] # this makes y have the same type as x
+
 TYPE OBJECTS # @INC
-	# unconventionally, Astro has Type objects which can be held by variables.
+	# unconventionally, Astro has Type objects which can be held by subjects.
 	# Sometimes, this concept may clash with generics, but they are basically different
 	# constructs with overlapping features.
 
-	var number = Type{Int} # covariant variable
-	# number can hold Int or its subtypes.
+	var number = Bool.type # covariant subject
+	# number can hold Bool.type or its subtypes.
 
-	var int = Type{Integer}
-	Type{Int} <: Type{Integer}
-	List{Int} <: List{Integer}
+	# NOTE: the above expression returns a Type object
+	# The expression below doesn't. It is a placeholder for the requested type.
+	var number = $[Bool]
 
-	func secToMin(num = Type{Number}, sec = Float):
-		if sec =: num:
-			sec / 60
+	Int.type <: Integer.type
+
+	Int.type.type == Type
+
+	func secToMin(int = Integer.type, sec = Float):
+		$[int] sec / 60
 	..
 
-	# passing a Type object as parameter.
-	secToMin(number, 25)
-	secToMin(Float, 6.5)
-
-	if number == Number: println('Not surprising')
+	secToMin Int.type, sec:24.45
 
 ENUMS
 	# in a way, enums are types that hold Type objects.
-	# an enum can be thought of as a type where its elements are
+	# a`n enum can be thought of as a type where its elements are
 	# subtypes of the type.
 	enum Days:
 		sunday, monday, tuesday, wednesday, thursday, friday
@@ -1100,12 +1292,12 @@ ENUMS
 	today = tuesday
 
 	# using allows an enum element to be used without the parent prefix.
-	using Days: .
+	using Days: .all
 	# hiding disallows an enum element to be used without the parent prefix.
-	hiding Days: .
+	hiding Days: .all
 
-	func todo(day = Days):
-		with> sunday: sleep
+	func todo day = Days:
+		wit_ sunday: sleep
 		with monday: work
 		with friday: tgif
 	..
@@ -1113,27 +1305,33 @@ ENUMS
 	enum Number: IntegerNumber(i = Integer), RealNumber(r = Real)
 
 OPERATOR OVERLOADING # @INC
-	var hybrid = Person{Dragon}
-	array[1] = 24
+	call()
+	setIndex()
+	getIndex()
+	setList()
+	setDict()
 
-	# Some operators have special syntax and placement strategy, they are noy unary, binary,
-	# etc., so they are given special function names.
-	func __cast(=Type{Person}, dragon=Dragon):
-		Person(dragon.name)
+	# special characters
+	# these are characters that cannot be combined with conventional identifier
+	# characters to form new identifiers. The only exclusions to this are
+	and, or, not, in # they can be used in conventional identifiers
 
-	__call()
-	__setIndex()
-	__setList()
-	__setBuffer()
-	__getIndex()
+	# indefinite characters
+	# these characters can only be used with other special characters of
+	# the same set to create new special identifier.
+	+, -, *, /, ^, √, &, |, >, <, =(special chars),
 
-	# certain operators that cannot be overloaded.
-	=, ::, <:, >:, >>, <<, ., ->, <-
-	# their suffix combos with other operators can also not be overloaded.
-	+=, />>,
+	# definite characters
+	# these group of characters cannot be overloaded as is, but can be combined
+	# to form new identifiers.
+	=, (special chars)=, ::, <:, >:, =::, =<:, =>:, >>, <<, ., <-, &&, ~, =>, !
 
-	# custom operator overloading
-	# you can combine certain operators to for, entirely new operators.
+	# language-level characters
+	# these group of characters cannot be overloaded nor can it be combined
+	# with other special characters.
+	->, ,, ., $
+
+	# overloading special characters
 	@op{postfix, left, 20}
 	func ++(n = Number): t = n ; ++n ; t
 
@@ -1143,16 +1341,19 @@ TRY, CATCH & ENSURE
 	# if a catch block or ensure block is not attached, they are evaluated at the
 	# termination of a function.
 
-	try: file->open->println(1:50)
+	try: file->open->println({1:50})
 	catch (ex = Exception):
-		with> FileNotFoundEx: printErr($1.msg)
+		wit_ FileNotFoundEx: printErr($1.msg)
 		with IndexOutOfBoundEx: printErr($1.msg)
 	..
 
+	# exception coalescing
 	f ->open`ferr->write('Hello')->close`ferr
 	catch ferr(fnfe = FileNotFoundEx): println self.msg
 	ensure: println('going out of scope')
 
+	memory[name]`{0} # catch all
+	memory[name]`{KeyNotFoundEx|NoValueEx ? 0} # catch specific exceptions
 
 	try let f = open('/sdcard/db.sql'): # managed resource
 		f.write(data)
@@ -1163,29 +1364,28 @@ TRY, CATCH & ENSURE
 MACROS # @INC
 	# Astro macros are resolved at Abstract Syntax Tree level.
 	var half = @reverseExpression 2 / 4
-	@assert num and den != 0
+	@assert num and den not 0
 
 
-# OTHER LITERALS # @INC
+OTHER LITERALS # @INC
 	let fraction = 3//2 # rational numbers.
 
 	var complex = 1 - 1im # complex numbers.
 
-	var symbol = {+ 2 {+ 4 5}} # symbols.
-
 	var regex = /\d+(.\d+)?/ # regex.
 
+	var ns_number = 345_NGN
 	var ns_str = li.'1, 2, 3, 4'
-	var ns_symbol = li.{1 2 3 5}
-	var ns_list = li.[1 2 3 5]
+	var ns_list = li.[1, 2, 3, 5]
+	var ns_dict = li.['name': 'Steve', 'age': 23]
 
 BUFFER TYPE
 	# buffer is a base array that types like List, Str, Chars use to build their internal
 	# array structure.
 	let int5 = Buffer{Int}(5)
 	# You can resize and also fill a buffer.
-	let buf = Buffer{Int}(10, 10).fill!(0)
-	buf.resize!(1, 20).fill!(0, _)
+	let buffer = Buffer{Int}(10, 10).fill!(0)
+	buffer ->resize!(1, 20) ->fill!(0, $$)
 
 BASIC ARITHMETIC OPERATIONS
 	let t = 2 + 2
@@ -1194,7 +1394,7 @@ BASIC ARITHMETIC OPERATIONS
 	var w = 5 -/ 2 # this returns a clamped Int result of the above
 	var x = 6 % 5
 	let y = 5i16 ^ 2i8
-	let z = I8{2 .root 25}
+	let z = I8(2 .root 25)
 
 INTEGER BITWISE FUNCTIONS
 	var x = 2 .bitand 5 # and
@@ -1204,370 +1404,28 @@ INTEGER BITWISE FUNCTIONS
 	var b = a .bitshl 2 # bit shift left
 	var c = b .bitshr 4 # bit shift right
 
-PREDEFINED TYPES # @INC
+PREDEFINED TYPE HIERARCHY # @INC
 	Any
-	Type
-	Func
-	Indie
-	Array
-	Number
-	Real
-	Integer
-	Bool
-	Int, UInt, I8, U8, I16, U16, I32, U32, I64, U64
-	F32, F64
-	List
-	Buffer
-	AbStr
-	Str, Chars
-	Cmp64, Cmp128
-	Generator
-	Range
-	Indexer
-	Tuple
+		Type
+		Func
+		Indie
+			Real
+				Integer
+					Int, UInt, I8, U8, I16, U16, I32, U32, I64, U64
+				Float
+					F32, F64
+			Complex
+				Cmp64, Cmp128
+			Bool
+		Array
+			Buffer
+			List
+				AbStr
+					Str, Chars
+				Range
+				Indexer
+			Tuple
+				Name Tuple
+		Generator
 
 # END
-
-
--------------------------------------
-
-# FUTURE BEGIN
-
-# NIL
-	var a = Str~ # can be nil
-	var b = Str # cannot be nil
-	a = nil
-	b = a # compile-time error! probable nil.
-	a = getID()~
-	if a: println(a)
-
-
-# INFIX VS ELEMENTWISE
-	var mA & mB = rand(5, 5)
-
-	mA + mB
-	mA * mB
-	mA .plus mB
-	mA .times mB
-
-	mA +. mB
-	mA *. mB
-	mA .plus. mB
-	mA .times. mB
-
-	mA.cross.(mB)
-	mA .cross. mB
-
-# GRAMMAR
-	if
-	for
-	while
-	func
-	type
-	enum
-	var|let
-
-# VAR AND LOOPS
-	# by default, for and function parameters are implicitly 'let'.
-	for book thru library where book.title.contains('adventure'):
-			personalLibrary.add(book)
-
-	func add(a, b): a + b
-
-# RANGE
-	for i thru 1:10 for j thru 1:20: println('[j], [i]')
-	let r =: 1:2:30[4]
-	let x =: f.read(1:10)
-
-#10/12/16
-# TUPLING
-	var dee = [4, 5, 6]
-	var ray = [1, 2, 3, ...dee]
-	func sum(...args): args.fold(:$1 + $2)
-	let tup =: ...ray
-
-#10/12/16
-# EVERYTHING IS AN OBJECT
-	var point =: (
-	type:
-		var x, y =: Float
-	func (x, y) # constructor
-	func div(): x / y
-	)(5, 6)
-
-	let fib = func:
-		if n < 2:
-			n
-		else:
-			fib(n - 1) + fib(n - 2)
-		..
-	..
-
-#10/12/16
-# CONVERSION
-	var x = Str{46}
-	let y = Int{"123"}
-	let z = F64{x.sort!}
-
-
-#10/12/16
-# OTHER LITERALS # @INC
-	let fraction = 3//2 # rational literal
-	var complex = 1 - 1im # complex literal
-	var symbol = {+ 2 {+ 4 5}} # symbol literal
-	var regex = /\d+(.\d+)?/ # regex literal
-	var ns_str = li.'1, 2, 3, 4' # non-standard string literal
-	var ns_symbol = li.{1 2 3 5} # non-standard symbol literal
-
-# 11/12/16
-# TYPE OBJECTS
-	var int = Type{Integer}
-	Type{Int} <: Type{Integer}
-	List{Int} <: List{Integer}
-
-# 11/12/16
-# CAST FUNCTION
-# the first parameter in cast function must be followed by at
-# least 1 non-type parameter
-	func __cast(=Type{Str}, ch = Chars):
-		var chars = List{ch}
-		var ls = I8[]
-		for char thru chars: # char is an I32
-			ls .append(...char.toUTF8)
-		Str{ls}
-	..
-
-# 13/12/16
-# FUNCTION AS A METHOD OF ITS FIRST ARGUMENT
-	func print(p = Person): print(self.name, self.age, self.gender)
-	# self refers to first arg
-	let matt = Person("Matthew", 24, "f")
-	print(matt)
-	matt.print() # dot notation
-	matt->print() # arrow notation
-
-# 13/12/16
-# CATCH FUNCTION
-	f
-	->open`fileErr
-	->write("hello", 6 + 5)
-	->close`fileErr
-	# catch deined as a function
-	catch fileErr(a =: FileNotFoundEx):
-		println a.msg
-	..
-
-# 13/12/16
-# INFIX PULL EFFECT
-	f ->open->write("Hello", 1 + 3)->close
-	println 245.toStr
-	println 5 + 5
-
-
-# 13/12/16
-# DYNAMIC DECLARATION VS COVARIANT DECLARATION
-	var x = 5
-	var z =: Int
-	var y = Int # even though a dnamic assingnment operator is being
-	# used here, but since it is only specifying a type, it becomes
-	# a covariant declaration
-	var m = F64 = 5.8
-
-# 13/12/16
-# DEFERRED CONSTRUCTION
-	type Animal(var name & kind = Str)
-	var dog = Animal # uninitialized covariant object, NB: this doesn't call the no-argument constructor
-	dog = "Bingo", "Alsatian" # this tuple is passed as a constructor
-	dog ("Bingo", "Alsatian") # this is a calls the constructor
-
-# 14/12/16
-# CONSTRUCTOR TYPES
-	type Animal(name & kind = Str)
-	type Animal(name & kind):
-		let name & kind = Str
-
-# 14/12/16
-# RETURN TYPE SIGNATURE
-	func sum(...args)-> Int: args.foldLeft(0, :$1 + $2)
-	func getDetails(emp = Employee)-> Str: '[emp.name]: [emp.job]'
-
-# 14/12/16
-# OPTIONAL BRACKETS IN FUNCTION DEFINITION
-	func add a & b -> Int: a + b
-	func main: println "Hello World!"
-	func: a + b
-	type Person var name age = Str <: Mammal
-
-# 14/12/16
-# DYNAMIC VS COVARIANT
-	let a # dynamic
-	let a = 5 # covariant
-	let a =: 5 # dynamic
-
-# 14/12/16
-# STICKY TO PIN
-	type Ball:
-		let kind
-		let pin instances
-	..
-
-	func gen:
-		let pin num = 0
-		rt num++
-	..
-
-# 14/12/16
-# HIDDEN FIELDS & METHODS
-	type Person:
-		let name = Str
-		let .age = Int
-	..
-	func .getAge: age
-
-
-# 14/12/16
-# MODULE
-	# a file is a module
-
-# 14/12/16
-# NS LITERALS
-	let z = m.[1, 2, 3, 4, 5]
-
-# 14/12/16
-# CHAINED DECLARATION
-	func add a & b = 0: a + b
-	let name & gender = 35
-
-# 14/12/16
-# CHAINED CONDITIONS
-	if x & y == 5: print z
-	if x and y == 5: print z
-
-# 14/12/16
-# COMPULSORY NAMED ARGUMENTS
-	func sendMessage(message & :to-recipient = Str, :shouting = false):
-		println((message + recipient).toUpper)
-
-	sendMessage 'Hello', to='Tony'
-
-	func index(myList = MyList, :at-index = Int):
-		self.list[index]
-
-# 14/12/16
-# UNWRAPPING NILABLE
-	let dave = peter~.name # dave becomes a nilable
-
-# 14/12/16
-# ASSIGNMENT
-	func name(n = Str): name_ = n
-	let age = 5
-	name('Barney')
-	name = 'Barney'
-	# objects have default callables that is same as ordinary assigment.
-	age(5)
-	age = 5
-
-# 14/12/16
-# SETTER, GETTER
-	let tiny =
-	set i: tiny = i + 2
-	get: tiny
-	tiny = 45
-	var a = tiny
-
-	func tony i: var pin value; value = i + 2
-	func tony: $:tony(Any).value
-	tony = 45
-	let a = tony
-
-# 14/12/16
-# FUNCTION OBJECTS
-	let c = $:add
-	let r = $:add(Int, Int)->Int
-	let d = $:(Int, Int)->Int
-	let e = Func
-
-# 14/12/16
-# STRING INTERPOLATION
-	let x = 5
-	let y = 'x = [x] 5 + 2 = [5 + 2]'
-
-# 14/12/16
-# Range
-	for x thru 1:(highest - 1): x
-
-	func add a & b: a + b
-
-# 14/12/16
-# ACCESS MODIFIERS
-	let `private = 5
-	let public = 6.0
-	var rd `privateRead = Car 'Mustang'
-	var wr `privateWrite = 'Hello'
-	let .hidden = 2
-
-# 14/12/16
-# REFERENCES
-	func swap! var a & b = ref: a, b = b, a;
-
-# 14/12/16
-# NO RETURN
-	func add a & b: a + b;
-
-# 16/12/16
-# MATCH STATEMENT
-	match name, isPassValid:
-		with> 'admin', true:
-		with 'guest', _:
-		with _, let isValid:
-		where name.isUpper:
-		..
-	..
-
-	match MyEnum:
-		with> Node(l, r): # for constructor types\
-		with Leaf:
-		..
-	..
-
-# 16/12/16
-# PASS FORWARD STATEMENT
-	input .lex .pase .compile .run
-	5 .add 5 .minus _
-
-
-# 16/12/16
-# DATA OR TYPE
-	data String:
-		let chars
-	..
-
-	type String:
-		let chars
-	..
-
-# 18/12/16
-# TYPE EXTENSION
-	type Programmer(languages) <: Person:
-		let languages = Str[]
-
-	func main:
-		let orobogenius = Programmer
-		steve.languages = ['Java', 'PHP', 'JavaScript']
-
-		extend Programmer <: WorkingPerson:
-			let philosophies = Str[]
-
-		let appcypher = Programmer(['Astro', 'Java', 'C++', 'Python'])
-		appcypher.philosophies = ['Open Source', 'Futurism']
-	..
-
-
-
-
-# TODO: SYNTAX HIGHLIGHTING
-- saving var names and not highlighting them
-- saving func names and highlighting them
-- saving type names and highlighting them
-
-# FUTURE END
