@@ -613,7 +613,7 @@ FUNCTION DEFINITION (2) # @INC
 
 	# the brackets of a named function can be ommitted too.
 	func add a & b: a + b
-	func _(a & b):  a + b # an anonymous must always have its brackets
+	func _(a & b):  a + b
 
 	# states of pinned subjects persist between function calls.
 	func callCount():
@@ -752,6 +752,7 @@ BRACKETLESS CALL VS ELEMENTWISE
 	mA .cross. mB
 
 CONSECUTIVE CALL CHAIN
+	check(lhs); check('=') ; check(rhs) # can be shortened to
 	check(lhs) && ('=') && (rhs)
 
 	println 'Hello' && '[name.isEmpty?'John Doe'||name]' && '!'
@@ -1094,7 +1095,7 @@ ABSTRACT TYPES & FUNCTIONS # @INC
 ANONYMOUS TYPES # @INC
 	# an anonymous type is a singleton with an ad hoc type definition.
 	# which include the type's fields and functions.
-	(type(state) <: Thread:
+	(type _(state) <: Thread:
 		var state = 'Paused'
 	func start var ?:
 	# the '?' here represents an object of the anonymous type
