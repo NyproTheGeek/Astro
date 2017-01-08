@@ -1,4 +1,4 @@
-# Astro
+# Astro Programming Lanaguage
 DESCRIPTION
 Astro is a statically-typed multi-paradigm language. 
 Astro relies on multiple dispatch and UFCS to make OOP intuitive. 
