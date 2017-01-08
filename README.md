@@ -6,4 +6,4 @@ Astro is heavily influenced by Python, Scala, Swift and Julia.
 
 Astro looks dynamic, but moves statically.
 
-I'm currently answering questions about the language [here](http://www.nairaland.com/3557200/astro-programming-language-0.2-made).
+We are currently answering questions about the language [here](http://www.nairaland.com/3557200/astro-programming-language-0.2-made).
