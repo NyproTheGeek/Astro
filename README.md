@@ -1,9 +1,9 @@
-# Astro Programming Lanaguage
+# Quadro Programming Lanaguage
 DESCRIPTION
-Astro is a statically-typed multi-paradigm language. 
-Astro relies on multiple dispatch and UFCS to make OOP intuitive. 
-Astro is heavily influenced by Python, Scala, Swift and Julia.
+Quadro is a statically-typed multi-paradigm language. 
+Quadro relies on multiple dispatch and UFCS to make OOP intuitive. 
+Quadro is heavily influenced by Python, Scala, Swift and Julia.
 
-Astro looks dynamic but moves statically.
+Quadro looks dynamic but moves statically.
 
 I'm currently taking questions about the language [here](http://www.nairaland.com/3557200/astro-programming-language-0.2-made).
