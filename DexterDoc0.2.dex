@@ -21,55 +21,63 @@ SUBJECT DECLARATION & DEFINITION
 	# let is used for subjects whose values cannot change.
 
 	let b = 5 # covariant subject declaration.
-	let c =: 'OroboGenius' # dynamic subject declaration.
+	let c <- 'OroboGenius' # dynamic subject declaration.
 	let d # uninitialized dynamic subject declaration.
+
+	# the difference between '=' and '<-' is only relevant in declarations
+	# they can be used interchangeably for other assignment operations.
+	b <- 23
+	c = "Name"
 
 	var Ω = 5, δ = 6 # multiple subject definition.
 	let x, y, z
 
 ASSIGNMENT
 	let pi & π = 3.14159265359 # initialize 'pi' and 'π' to the same value.
-	let pi, π = getPi() # both are assigned to the same value, if
-	# expression is tuple, both are assigned respectively to each subject.
+	let pi, π = getPi() # only pi is initialized with getPi()
+
 	let a, b, c = ...getList()
 
-	# In dexter, a zero-argument conctructor call can be called without
-	# the brackets except in subject declarations.
+
 	# Bracketless zero-arg constructor is for specifying types in subject declaration.
  	let count = Int # Int is not a constructor call here. Just specifying type.
+
 	let count = Int() # Int() is a constructor call here. count is initialized.
 
+	# elsewhere bracketless zero-arg constructor are constructor calls
+	a = Car # also Car()
+	print(Label) # also Label()
+
 CONSTANTS
-	let b; b = 56
+	let b; b <- 56
 	let d = Int; d = 10 # error!
 
 FUNCTION DEFINITION (1)
-	func add(var a, b):
-		rt a + b # rt returns a value from a function.
+	func add(var a, var b):
+		return a + b # returns a value from a function.
 	..
 
-	var sum = add(25, 52)
+	var sum <- add(25, 52)
 
 	func add(a, b): # parameters are 'let' by default
-		rt a + b
+		return a + b
 	..
 
 EXPRESSION-ORIENTED
-	var isNyproCrazy = faveHobby == 'CountingBirds' # returns true or false to isNyproCrazy
+	var isNyproCrazy <- faveHobby == 'CountingBirds' # returns true or false to isNyproCrazy
 
 	func add(a, b):
-		a + b # 'rt' is not needed here. result of a + b will be returned to the caller.
+		a + b # 'return' is not needed here. result of a + b will be returned to the caller.
 	..
 	nypro.hieght = add(aditya.height, -tripleo.height)
 
 	# a semi-colon at the end of a block, stops it from returning its evaluated
 	# result
-	func setName(var p = Person, var name = Str):
+	func setName(var p = Person, var name <- Str()):
 		p.name = name;
 	..
 
-	let john = setName('John Smith') # error! setName returns no result.
-
+	let name <- setName('John Smith') # error! setName returns no result.
 
 SPECIFYING TYPES
 	var number = 5
@@ -77,7 +85,7 @@ SPECIFYING TYPES
 	let salary = Pay # default costruction.
 	salary = Pay(5_000, 12) # deferred construction.
 
-	var task = Str('Create a programming language')
+	var task <- Str('Create a programming language')
 	var identifier = Str|Int # optional type specification.
 	# identifier is currently uinitialized.
 	identifier = 'Book'
@@ -89,75 +97,63 @@ SPECIFYING TYPES
 BUILT-IN TYPES
 	# NOTE: Built-in types are much more than these.
 	var index = UInt = 2_000 # UInt represents unsigned integer; no negative values.
-	var debt = Int = -100 # Int represents signed integer; you can have negative values.
+	var debt <- Int = -100 # Int represents signed integer; you can have negative values.
 	let e = F64 = 2.718281828459045
-	let dogBreed = Str = 'German Shepherd' # Str represents immutable UTF-8 string.
+	let dogBreed <- Str = 'German Shepherd' # Str represents immutable UTF-8 string.
 	var laptop = Chars = 'Alienware M18' # Chars represents mutable UTF-32 string.
 	var listOfGroceries = ['Oranges', 'Cabbages', 'Tomatos', 'Bananas'] # this is a list.
-	var game, year = 'BioShock Infinite', 2014 # this is a tuple.
+	var game, year <- 'BioShock Infinite', 2014 # this is a tuple.
 
 VALUES & REFERENCES
 	# by default primitive objects (UInt, Int, Float, Bool) are passed around by value and
 	# by default complex objects (Str, user-defined types) are passed around by reference.
 	var number = 502
-	var account = getAccount('Dumbledore')
+	var account <- getAccount('Dumbledore')
 
 	# however, you can change this behavior with 'ref' and 'val'.
 	var newAccount = val account # passing a complex object by value.
 	var pointer = ref number # passing a primitive object by reference.
 
-	# Dexter uses reference counting to manage memory, unlike Python or
-	# Javascript (tracing GC), as a result, there are times when
-	# cyclic reference occurs and needs to be resolved.
-	# 'wref' is used to break such cycle.
-	myCompany.affiliate = ref yourCompany
-	yourCompany.affiliate = wref myCompany
+	# Dexter uses compile-time reference counting to manage memory, unlike Python or
+	# Javascript which use runtime tracing GC.
+	# It also does reference cycle breaking at compile-time. :)
+	myCompany.affiliate <- ref yourCompany
+	yourCompany.affiliate = ref myCompany
 
 	jeans = def trousers # def uses the default type of passing
 
 	let myAccount = iso Account('Nypro')
 	# iso means only the subject can hold a reference to the object.
 
-	let player = wref team.player
+	let player <- team.player
 
 	# you can specify a dynamic subject reference beforehand
-	let library iso
+	let library <- iso
 
 	func getAmount():
-		rt rd amount
+		return rd amount
 	# 'rd' means an object is passed by reference, but it cannot be written to,
 	# only read from.
 
-	func swap!(var a ref, var b ref):
+	func swap!(var a = ref, var b = ref):
 		a, b = b, a;
 	..
 
 NUMBERS
 	var index = 5
 	var axis = -3
-	let meters = 0.25e-5
+	let meters <- 0.25e-5
 	let salary = 10_000f
 	var color = 0x6FFF00p+12 # hex
 	var opCode = 0b10110001 # bin
-	var interest = 0o566768 # oct
+	var interest <- 0o566768 # oct
 
 ACCESS MODIFIERS
 	var money = 0 # subjects, functions, types, etc. are public by default.
 	var `laptopModel = 'HP Pavilion' # private to a module.
 
 	# hidden functions and fields are accessible only by a type's methods and fields
-	func .sub(a & b = Num): a + b
-
-ACCESS MODIFIER BLOCK
-	# you can also define a modifier block, where subjects, functions, etc.
-	# within the block share the block's modifiers.
-	mod let `:
-		kmPerMiles = 1.61
-		radPerDeg = 180 / pi
-	mod var .:
-		func .sub(a & b = Num): a + b
-		func .add(a & b = Num): a + b
-	..
+	func .sub(a & b <- Num): a + b
 
 READ-ONLY/WRITE-ONLY ACCESS MODIFIERS # @INC
 	var wr `keep = []
@@ -168,11 +164,13 @@ TUPLES
 	var game = ('Uncharted 4', 2016) # this is a closed tuple
 
 	# NOTE: an open tuple is passed by value, a closed tuple is not
-	name, age = age, name
+	name, age <- age, name
 
-	let make, year = ...getCar()
+	let make, year <- ...getCar()
 
 	let index, car = 15, ('Ferrari', 1995) # car is a tuple.
+
+	let car & model <- "Camaro" # both car and model subject are assigned "Camaro"
 
 	let map = () # empty tuple
 
@@ -183,19 +181,20 @@ PROPERTIES
 	# properties provide getter/setter behavior, so that implementation
 	# of a subject can be flexible.
 	var attribute =
-		set hieght:
+		set(hieght):
 			attribute = hieght * 2
 		get:
 			attribute
+		..
 
 	var name, attribute = 'Daniel Olaniyan', 4.8
 
 LISTS
 	var unorderedList = [7, 3, 8, 5, 4, 0, 9, 1, 2, 6]
 
-	var names = [] # empty list
+	var names <- [] # empty list
 
-	var contestants = |Str|['Steve', 'Aditya', 'Sizwe', 'Pierre']
+	var contestants = :Str['Steve', 'Aditya', 'Sizwe', 'Pierre']
 
 	# Dexter uses 1-based indexing, so every list indices start at 1.
 	var disqualified = contestants[mid:last] # 1st index to the 3rd index.
@@ -206,13 +205,13 @@ LISTS
 	reversed[2] # when indexing a list, there shouldn't be any space between
 	# the subject identifier and the open (square) bracket.
 
-	let myGarage = |Car|[('Mustang'), ('Eleanor'), ('Bugatti'), ('Lamborghini')]
+	let myGarage <- :Car[('Mustang'), ('Eleanor'), ('Bugatti'), ('Lamborghini')]
 
-	let yearSalary = |12 Int|[] # you can specify a static size for the list.
+	let yearSalary = :12 Int[] # you can specify a static size for the list.
 
 	yearSalary[1:3] = [2_000, 2_000, 2_500] # you can assign to a range of indices.
 
-	var matrix = |2*2|[
+	var matrix = :2*2 Int[
 		[1, 0],
 		[0, 1]
 	]
@@ -220,7 +219,7 @@ LISTS
 
 	var matA = |2*age|[,] # 2 rows with unknown column length
 
-	matA[:,:] = [
+	matA[:,:] <- [
 		[1, 6, 3],
 		[3, 7, 4]
 	]
@@ -240,7 +239,7 @@ LISTS
 	# 2
 	# 3
 
-	let x = y[:2]@
+	let x <- y[:2]@
 
 	# splatting a list
 	let a = [
@@ -263,6 +262,12 @@ LISTS
 	# 1 2 1 0
 	# 0 4 2 4
 
+	# proposed operations with lists.
+	var concatenate = [1, 2] ++ [3] # [1, 2, 3]
+	var multiply <- [1, 2] ** 2 # [1, 2, 1, 2]
+	let subtract <- [1, 2, 3, 4, 3] -- [4, 3] # [1, 2]
+	let divide = [1, 2, 5, 6, 3, 4] // [5, 6] # [[1, 2], [3, 4]]
+
 
 DICTIONARIES
 	# dictionaries are basically key-value lists.
@@ -273,8 +278,8 @@ DICTIONARIES
 	var class1Scores = testScores['class room 1']
 	# keys can also be quoted like strings
 
-	var contacts = [:] # empty dictionary
-	var user = |Str, User|[:]
+	var contacts <- [:] # empty dictionary
+	var user = :2*2 Str,User[:]
 
 OTHER TYPES OF LISTS
 	var range = {0:20} # range is a type of list
@@ -282,25 +287,30 @@ OTHER TYPES OF LISTS
 	# it holds ref to a subset of another list
 
 PACKING & UNPACKING
-	var list = [{0:20}] # [ ] turns a generator or tuple to a list.
-	var tuple = ...list # ... turns a generator or list to a tuple.
-	var dict = [tuple:] # [:] turns a tuple to a table.
+	var list = [for x in 10: x] # [ ] turns a generator to a list.
+	var open = ...list # ... turns a generator, list or closed tuple to an open tuple.
+	var dict <- [:tuple] # [:] turns a closed tuple or a tuple generator to a table.
+	var closed <- (a, b, c) # turn an open tuple to closed tuple
 
 	let primes = [2, 3, 5, 7, 11]
 	let numbers = [2, 4, 8, ...primes]
 
-	func sum(...args = Real): args .fold => $1 + $2
+	func sum(...args = Real): args .fold((a, b) => a + b)
 
 STRINGS
 	let language = 'Dexter'
-	let year = 2015
+	let year <- 2015
 	var story = "[language] was started in [year]" # string interpolation.
+
 	let calc = '5 * 50 = [5 * 50]'
 	# both single and double quotes can be used to represent a string literal.
 
+	# String formatting
+	println "The price is [price.%2f]"
+
 	# non-standard string literals preceded by characters are not affected
 	# by escape sequences, because they are processed verbatim.
-	var verbatimStr = raw."Use '\t' to represent tab"
+	var verbatimStr <- raw."Use '\t' to represent tab"
 
 	# here string (DEPRECATED). first and last new lines are always ignored.
 	var verbatimStr = '''
@@ -310,14 +320,14 @@ STRINGS
 	var string = 'Hello' # Str
 	var chars = ch.'Hello' # Chars
 
-	# operations with strings.
+	# proposed operations with strings.
 	var concatenate = 'ab' + 'c' # 'abc'
-	var multiply = 'ab' * 2 # 'abcabc'
-	let subtract = 'abcac' - 'ca' # 'abc'
+	var multiply <- 'ab' * 2 # 'abcabc'
+	let subtract <- 'abcac' - 'ca' # 'abc'
 	let divide = 'abcdeabc' / 'de' # ['abc', 'abc']
 	let escapeSequences = '\t \n \' \" \[ \# \\'
 
-	var greeting = # multiline string.
+	var greeting <- # multiline string.
 	'Hello,' +
 	'World!'
 
@@ -342,11 +352,11 @@ MULTILINE EXPRESSIONS # @INC
 
 	# - where the last expression on a line is be followed by a non-unary
 	# operator on the next line
-	var zero = (25-(2^4/4)
+	var zero <- (25-(2^4/4)
 	*(9+(-36/4))+25)
 
 	var noRepeatSum = x and y == z ? x || x == y ? y + z
-	|| x == z ? z + y || y == z ? z + x || x + y + z
+	: x == z ? z + y || y == z ? z + x || x + y + z
 
 	myName
 		.strip!()
@@ -378,7 +388,7 @@ IF STATEMENT
 	if phoneNumber == nil:
 		useEmail()
 
-	if var stockCode = getStockCode('APPLE'): # block is evaluated if stockCode is not nil
+	if var stockCode <- getStockCode('APPLE'): # block is evaluated if stockCode is not nil
 		println('APPLE: [stockCode]')
 
 	if copy = getCopy():
@@ -398,37 +408,37 @@ IF STATEMENT
 	# else statements stacked accordingly
 	if tim.age > 16 if car.state == 'good':
 		tim.drive car
-	else: throw Ex 'Driver must over the age of 16'
-	else: throw Ex 'Car is in bad state. Repair immediately!'
+	else: raise Ex 'Driver must over the age of 16'
+	else: raise Ex 'Car is in bad state. Repair immediately!'
 
 NIL
 	# sometimes, it is important to represent an empty or missing state, this can be
 	# achieved in Dexter with optional typing.
 	var code = Str # cannot be nil
-	var program = Str|Nil = 'println \"Hello World\"'
-	var anotherProgram = Str~ = nil
+	var program <- Str|Nil = 'println \"Hello World\"'
+	var anotherProgram = Str? = nil
 
 	# a nilable cannot be assigned to a non-nilable subject without a proper
 	# nil coalescing with a fallback value.
-	var programList = Str~
-	var cartoonList = |Str|[]~
-	cartoonList = programList?||[]
+	var programList = Str()?
+	var cartoonList <- |Str?|[]
+
 	let profile = server
-		.user('Name')~{Account 'default'}
-		.profile~{Profile 'default'}
-
-	# using the coalescing operator, you can specify what expression gets evaluated
-	# if an expression returned nil.
-	var account = remote.account('Deadpool')?||0 # if account returns nil, assign 0 instead.
-
-	var nypro = search('Nypro')?||println('Nypro does not exist!')
+		.user('Name')?{Account 'default'}
+		.profile?{Profile 'default'}
 
 	if feeds: println('no feeds') # = if feeds equals nil or false.
+
+	(getAccount "default")?
+
+	# nil-then-raise operator
+	getAccount("Default")?! # if result is nil, raise NilErr
+	game.fix?!
 
 	if isRecieving == nil:
 		println('remote server stopped recieving')
 
-	let john = Person dave~.name # unwrapping a nilable obbject
+	let john <- Person dave?.name # unwrapping a nilable object
 
 CONDITIONS
 	# Dexter discourages reptition in conditional expression.
@@ -472,16 +482,16 @@ FOR LOOP
 	for upper in {1:20} for lower in {1:20}: # @INC # nested iterations through ranges.
 		println('[upper] -:> [lower]')
 
-	var oddList = [for i in {1:20} where i % 2 != 0: x] # list comprehension.
+	var oddList <- [for i in {1:20} where i % 2 != 0: x] # list comprehension.
 
 	for i in {1:20}:
 		i += 1 # error! immutable subject.
-		j = i
+		j <- i
 	..
 
 	for var i in {1:20}:
 		i += 1
-		j = i
+		j <- i
 	..
 
 	for _ in {1:fifty}:
@@ -490,13 +500,14 @@ FOR LOOP
 HOLD SUBJECTS
 	for color in colors:
 		var hold i = 1 # a hold subject's state persist for the duration of the loop.
-		println(i, color); ++i
+		println(i, color)
+		i += 1
 	..
 
 	func sum(list):
 		var hold index = 1 # you can also have hold subjects for recursive functions.
-		if x.size() < 1:
-			rt 0
+		if x.size < 1:
+			return 0
 		else:
 			list[index] + sum(list[++index:])
 	..
@@ -547,7 +558,7 @@ WHILE LOOP & LOOP
 	..
 
 	redo:
-		lines += gen.readLine() # evaluated at least once.
+		lines <- gen.readLine() # evaluated at least once.
 	while gen.hasNext()
 
 	while var user = genRandomUser():
@@ -562,12 +573,13 @@ TERNARY OPERATOR
 	# ternary operator is a summarized if-else clause.
 	var absValue = a > 0 ? a || -a
 
-	# the else part of a ternary operator can be omitted.
-	song in playlist ? play playlist[song]
+	song in playlist ? play playlist[song] || _
+
+	if a == b > c ? b || c: print a
 
 BLOCKS AND LINES
 	# a block represents a scope
-	let country = 'India'
+	let country <- 'India'
 	block:
 		let country = 'Nigeria'
 		println country # Nigeria
@@ -576,7 +588,7 @@ BLOCKS AND LINES
 
 	# block structures must be closed with a corresponding end punctuator '..'.
 	for color in colors:
-		var hold i = 1
+		var hold i <- 1
 		println(i, color)
 		++i
 	..
@@ -598,7 +610,7 @@ BLOCKS AND LINES
 
 FUNCTION DEFINITION (2) # @INC
 	# functions can be optionally annotated with argument types and return types.
-	func mul(a = Int, b = Int) -> Int: a * b
+	func mul(a = Int, b <- Int) -> Int: a * b
 
 	# arguments next to each other can share an assignment by separating them
 	# with '&' instead of commas.
@@ -607,31 +619,33 @@ FUNCTION DEFINITION (2) # @INC
 
 	# varargs.
 	func arithMean(...numbers = F64):
-		var total = 0d
+		var total <- 0d
 		for number in numbers:
 			total += number
 		total / numbers.size
 	..
 
-	# args as an array of argument
+	# $* as an array of argument
 	func mean(a, b, c, d, e):
-		args.(foldLeft 1, => $1 + $2) / args.size # args represnt all the arguments in an array.
+		$*.(foldLeft 1, => $1 + $2) / $*.size # $* represents all the arguments in an array.
 	..
 
-	# the brackets of a function call maybe ommited, the following tuples will be taken as its argument
-	func greet(): println 'Hello!'
+
+	# if a function has no parameter, the brackets are optional
+	func greet: println 'Hello!'
 	func divAll(...nums): nums.fold => $1 / $2
 
+	# the brackets of a function call maybe ommited, the following tuples will be taken as its argument
 	greet # 'Hello!'
 	divAll 16, 2, 4 # 2
 	divAll (16, 2), 4 # 8 # Note 4 is not part of the argument
 
 	# the brackets of a named function can be ommitted too.
-	func add a & b: a + b
+	func add(a & b): a + b
 	func _(a & b):  a + b
 
 	# states of pinned subjects persist between function calls.
-	func callCount():
+	func callCount:
 		var pin count = 0 # @INC
 		println('Call count [count]')
 	..
@@ -640,7 +654,7 @@ FUNCTION DEFINITION (2) # @INC
 	func sum(list):
 		var hold index = 1 # @INC
 		if x.size() < 1:
-			rt 0
+			return 0
 		else:
 			list[index] + sum(list[++index:])
 	..
@@ -651,15 +665,18 @@ FUNCTION DEFINITION (2) # @INC
 
 	# self always refers to the first parameter.
 	func getDetails(u = User): self.name, self.age
+
+	# in place of 'self', '~' can be used
+	func getDetails(~User): ~name, ~age
+
 	func getDetails(): 'Mr Nobody', 0
-	var name, age = getDetails
+	var name, age <- ...getDetails
 	# function objects.
 	var details = getDetails$ # details refer to a generic overload.
 	var details2 = getDetails$ User # details2 to a specific overload getDetails(User).
 
-	var xyz = doSth$(~Int, ~Bool)
-	var abc = (doSth$ ~Int, ~Bool) # using bracketless call
-	var binaryOp = (func _ ~Number, ~Number -> Number)
+	var xyz = doSth$(Int, Bool)
+	var binaryOp = func _(~Number, ~Number)-> Number
 	var initServer = Func
 	var range = (
 		func _:
@@ -667,17 +684,17 @@ FUNCTION DEFINITION (2) # @INC
 			while i < 11: yd ++i
 	)
 
-	func greet name, f = (func _ ~Str): f name;
+	func greet(name, f = func _(~Str)): f name;
 
 	# default parameter values
-	func login(email='demo', username = 'demo', password = 'demo'):..
+	func login(email <- 'demo', username <- 'demo', password <- 'demo'):..
 
 	login(_, 'nyprothegeek', 'bazinga!')
 	login('nyprothegeek@gmail.com', 'nyprothegeek')
 
 
 	# nameless parameters
-	func convert(~Float, num = Int): $[$1] num
+	func convert(~Float, num = Int): $($1) num
 
 	Int.convert(2.34)
 	F64.convert(56_750)
@@ -701,7 +718,7 @@ FUNCTION DEFINITION (2) # @INC
 	let rodriguez = Player name:'Rodriquez Bastion'
 
 	# compulsory named arguments
-	func sendMessage(message & :to-recipient = Str, :shouting = false):
+	func sendMessage(message & :to-recipient <- Str, :shouting <- false):
 		println((message + recipient).toUpper)
 
 	sendMessage 'Hello', to:'Cantell'
@@ -713,22 +730,28 @@ FUNCTION DEFINITION (2) # @INC
 		; # an ending colon, stops the function from implicitly returning the last expression.
 	..
 
+	# currying
+	# function currying needs brackets to prevent ambiguity
+	add()(54) #= shouldn't be written as =# add 54
+	# instead use:
+	(add) 54 #= or =# add()(54) #= or =# add() 54
+
 	# _ can also be used as a placeholder for returning nothing
-	func add a, b: a + b; _
+	func add(a, b): a + b; _
 
 BRACKETLESS CALL
-	func plus a = Numero, b = Numero:
+	func plus(a = Numero, b = Numero):
 		Numero a.value + b.value
-	func minus a = Numero, b = Numero:
+	func minus(a = Numero, b = Numero):
 		Numero a.value - b.value
-	func sum ...args = Numero:
+	func sum(...args = Numero):
 		Numero args.fold add$
 
-	var numero1 = Numero 15
-	var numero2 = Numero 70
+	var numero1 <- Numero 15
+	var numero2 <- Numero 70
 
-	var numero3 = numero1 .plus numero2 .minus Numero(23) # bracketless function call
-	var numero4 = numero1 .sum numero2, numero3 # tuple args passed to a bracketless
+	var numero3 <- numero1 .plus numero2 .minus Numero(23) # bracketless function call
+	var numero4 <- numero1 .sum numero2, numero3 # tuple args passed to a bracketless
 	# sum
 
 	5 .plus 6 .minus 7 == 5.plus(6).minus(7) != 5.plus(6.minus(7))
@@ -736,7 +759,7 @@ BRACKETLESS CALL
 
 	loop: println('>>>', scanln() .lex .parse .compile .interpret)
 
-	# argument wall using '{' and '}' makes bracketless call possible even more readable
+	# argument wall using '(' and ')' makes bracketless call possible even more readable
 	profile ->(deleteContact 'Tosin', 'Tunde') ->changeAvatar '/album/grad/0123.png'
 
 	makeCar make:'Toyota', model:'Sienna', date:(Date 1, 1, 17)
@@ -747,7 +770,7 @@ BRACKETLESS CALL
 
 	println(('Hello' + name).strip)
 
-	getCompany managers, (getCompany 'PZ')~{getSub 'PZ', kind 'new'}.users, founders
+	getCompany managers, (getCompany 'PZ')?{getSub 'PZ', kind 'new'}.users, founders
 
 BRACKETLESS CALL VS ELEMENTWISE
 	var mA, mB = rand(5, 5)
@@ -775,7 +798,7 @@ CONSECUTIVE CALL CHAIN
 	e.setName 'Badmus' >> 'Travis' >> 'Gabriel'
 
 	# consecutive call chain tupling
-	let tony, barn, rod =
+	let tony, barn, rod <-
 		list.getPerson 'Anthony', >> 'Barney', >> 'Rodney'
 
 FUNCTIONS AS ARGUMENTS & LAMBDAS
@@ -783,7 +806,7 @@ FUNCTIONS AS ARGUMENTS & LAMBDAS
 	let scoreListWithExtraMarks = scoreList.map(func _(score): score + 5)
 	let scoreListWithExtraMarks = scoreList.map(myFunc$)
 
-	fixtureList .filter game => !game.isCancelled
+	fixtureList .filter (game) => !game.isCancelled
 	fixtureList .filter => !$1.isCancelled
 
 	# if function being passed is one, the definition of the function can be written
@@ -797,15 +820,15 @@ FUNCTIONS AS ARGUMENTS & LAMBDAS
 		println "World"
 	), true
 
-	var f = (func _ name: println 'Hi [name]')
-	var f = name => println 'Hi [name]'
-	func f name: println 'Hi [name]'
+	var f = func _(name): println 'Hi [name]'
+	var f = (name) => println 'Hi [name]'
+	func f(name): println 'Hi [name]'
 
 CLOSURE
 	# a closure is an inner function.
 	func genDBConnector(:host & :username & :password = Str):
 		func makeDBConection():
-			rt db.connect(host, username, password) # a closure can be returned.
+			return db.connect(host, username, password) # a closure can be returned.
 		makeDBConection
 	..
 	var dbCallback = genDBConnector(host:'localhost', username:'nypro', password:'willdiearobot')
@@ -839,17 +862,19 @@ COFUNCTIONS # @INC
 	remove$ += refreshUI$ # attaching a cofunction to a generic overload.
 	emit movieList.remove(2) # emit is used to run the function along with its cofunctions.
 
-	(remove$ ~List, ~Int) += refreshUI$ # attaching a cofunction to a specific overload.
+	remove$(List, Int) += refreshUI$ # attaching a cofunction to a specific overload.
 
 USEFUL FUNCTIONS # @INC
 	typeOf(24)
-	size('Hello, world!')
+	size([1, 2, 3, 4]) # size is a constant-time operation.
+	count("Hello, world!") # count may be a linear-time operation.
 	enumerate(colors)
 	map names, =>$1 + ' '
 	filter(list, =>isPrime $1)
 	each list, =>print($1, ', ')
 	noneMatch numbers,  => isEven $1
 	printf('The circumference of a circle with radius 5 is %f', pi * 5^2)
+	respondsTo(object, function$)
 
 USEFUL CONSTANTS
 	nl == '\n'
@@ -875,21 +900,21 @@ MATCH EXPRESSION & CASE STATEMENT
 	..
 
 	match message
-	with Int$: println message
+	with :Int: println message
 	with Start(1): self.count message.num
 	with Terminated("Success"): print message.msg
 
 	func opCodeDispatch(opCode = Str, args = [], var index & result = Int):
-		result = 0
+		result <- 0
 		# a case statement can be written without a match header
 		# this means its taking the parmeter tuple of the function as arguments
 		# in this case, te case block needs to start with a top
 		# 'w:th' or 'c:se'
-		w:th 'ADD' : rt result = args[index] + args[++index]
-		with 'SUB' : rt result = args[index] - args[++index]
-		with 'MUL' : rt result = args[index] * args[++index]
-		with 'DIV' : rt result = args[index] / args[++index]
-		with 'EQ'  : rt args[index] == args[index+1] ? index += 3 || spill
+		w:th 'ADD' : return result = args[index] + args[++index]
+		with 'SUB' : return result = args[index] - args[++index]
+		with 'MUL' : return result = args[index] * args[++index]
+		with 'DIV' : return result = args[index] / args[++index]
+		with 'EQ'  : return args[index] == args[index+1] ? index += 3 || spill
 		with 'JUMP' or 'SKIP' : index += args[index += 2]
 		println 'Opcode error!'
 	..
@@ -911,42 +936,55 @@ ones.twos.threes.collect
 collect(threes(twos(ones())))
 
 func ones: yd 1
-func twos gen=Generator: yd gen + 2
-func threes gen=Generator: yd gen + 3
+func twos(~Generator): yd gen + 2
+func threes(~Generator): yd gen + 3
 
-func collect gen=Generator:
+func collect(~Generator):
     list = []
     for i in gen: list .append i
     list
 ..
 
 TYPE DEFINITION
-	# types in Dexter cannot contain functions. Even the constructors and destructors are
-	# defined outside the type.
+	type Animal:
+		let name & kind = Str
+
+		func init(name, kind): # constructor
+			new(name, kind)
+
+		func eat:
+			"Eating"
+
+		func sleep:
+			"Sleeping"
+	..
+
+	# types in Dexter do not necessarily need to have their functions defined inside them.
 	# This allows for future extension of a type without touching the type's source code.
-	# Users of a type can extend it with ease.
-	# It also makes the the separation of data from operations clear.
 
 	type Car:
-		var maker, model = Str
+		var make, model = Str
 		let year = Int
 	..
 
+	func move(c = Car):
+		"Moving"
+
 	# construtors that call new can only be defined in the same
 	# module as the type. Same applies to destructors.
-	func Car(name = Str):
-		new(name)
+	func Car(make = Str):
+		new(make)
 		# new is a special function that creates a new object and maps
 		# the arguments to corresponding fields
 	..
+
 	func Car(maker, model, year)
 	func Car(~) # normal # called on Car object during destruction. # @INC
 	func Car(!) # exception # called on Car object during an exception. # @INC
 	type Person(var .name & age) # Person is a constructor type.
 	# Constructor types have just main constructor and the parameters
 	# of the constructor are mapped to fields.
-	type Animal(name & kind):
-		let name & kind = Str
+
 	var john = Person('John Connor', 23)
 
 	type Lamp(color)
@@ -962,53 +1000,57 @@ FIELD ACCESS MODIFIERS
 		# the program's lifetime.
 		var pin .sole = Singleton
 		var value = Int
-	..
 
-	func .Singleton():
-		if self.count == 0:
-			++count
-			rt self.sole = new value
+		func .init:
+			if self.count == 0:
+				++count
+				return self.sole = new value
+			..
+			self.sole
 		..
-		self.sole
 	..
 
 	func Singleton(value = Int):
-		var x = Singleton
-		x.value = value
+		var x <- Singleton
+		x.value <- value
 	..
 
 TYPE EXTENSION
 	type Programmer(specializedLanguages) <: Person:
-		let languages = |Str|[]
+		let languages = :Str[]
 
 	func main:
 		let orobogenius = Programmer
-		orobogenius.languages = ["Java", "PHP", "JavaScript"]
+		orobogenius.languages <- ["Java", "PHP", "JavaScript"]
 
 		# type extension is limited to its scope
 		extend Programmer <: WorkingPerson:
-			let philosophies = |Str|[]
+			let philosophies = :Str[]
 
 		let appcypher = Programmer ["Dexter", "Java", "C++", "Python"]
 		appcypher.philosophies = ["Open Source", "Futurism", "Transhumanism"]
+
+		extend Programmer(name, var resume, var mentor)
+
+		let nypro = Programmer("Nypro", "https://chicken.poop.com/nypro", "Captain Jack Sparrow")
 	..
 
 INHERITANCE # @INC
 	type Animal
-	func sound(animal = Animal):
+	func sound(~Animal):
 		println('Nothing')
 
 	type Bird <: Animal
-	func sound(bird = Bird): # overrides supertype function.
+	func sound(~Bird): # overrides supertype function.
 		println('Chirp!')
 
 	type Horse <: Animal:
-	func sound(horse = Horse):
+	func sound(~Horse):
 		println('Neigh!')
 
 	# Dexter supports multiple inheritance.
 	type Pegasus <: Horse, Bird:
-	func sound(pegasus = Pegasus):
+	func sound(~Pegasus):
 		Horse.sound(pegasus)
 
 	# due to Dexter's multiple dispatch, Inheritance applies equally to all
@@ -1026,10 +1068,10 @@ INHERITANCE # @INC
 	func baz(x = X, a = A):..
 
 	func baz(x = X, b = B):
-		baz(x, super <- b)
+		baz(x, b as super)
 
 	func baz(x = X, b = B):
-		baz(x, A <- b)
+		baz(x, b as A)
 
 	type Person(var name & gender = Str, age = Int)
 
@@ -1043,7 +1085,7 @@ INHERITANCE # @INC
 
 	func print p = Person: print p.name, p.age
 	func print e = Employee:
-		super.print # or print super <- e
+		super.print # or print e as super
 		print sp, e.job, e.company
 	..
 
@@ -1051,7 +1093,7 @@ ABSTRACT TYPES & FUNCTIONS # @INC
 	type abs Player # abstract types cannot be instantiated.
 
 	# a function without a body (apart from constructors) is an abstract function and
-	# an error is thrown if it is called directly. An abstract function is expected to
+	# an error is raised if it is called directly. An abstract function is expected to
 	# be implemented by a corresponding subtype function.
 	func play(pl = Player)
 	func rewind(pl = Player)
@@ -1069,18 +1111,20 @@ ABSTRACT TYPES & FUNCTIONS # @INC
 	type Node(l = Leaf, r = Tree) <: Tree
 
 	func sum(t = Tree):
-		w:th Leaf$: t.value
-		with Node$: sum(t.l) + sum(t.r)
+		w:th :Leaf: t.value
+		with :Node: sum(t.l) + sum(t.r)
 	..
 	var x = Node(Leaf(1), Node(Leaf(2), Leaf(3)))
 
 ANONYMOUS TYPES # @INC
 	# an anonymous type is a singleton with an ad hoc type definition.
 	# which include the type's fields and functions.
-	(type _(state) <: Thread:
+	(
+	type _(state) <: Thread:
 		var state = 'Paused'
-	func start _: # the '_' here represents an object of the anonymous type
-		println('Thread: [self.state]')
+		func start:
+			println('Thread: [self.state]')
+	..
 	)('Working')
 
 	var currentShow =
@@ -1089,16 +1133,16 @@ ANONYMOUS TYPES # @INC
 	currentShow.show
 
 TYPE CHECKING
-	if myCar =:: Car:
+	if myCar :: :Car:
 		println('myCar is a Car')
 
-	if myCar === Car:
+	if myCar == :Car:
 		println('myCar is a Car or its subtype')
 
-	if myCar =<: Car:
+	if myCar <: :Car:
 		println('myCar is a supertype of Car')
 
-	if myCar =>: Car:
+	if myCar >: :Car:
 		println('myCar is a supertype of Car')
 
 REFERENCE CHECKING
@@ -1140,7 +1184,7 @@ CALL CHAINING
 	profile->open()->deleteMsgs()->close()
 
 	# returned object forwarding.
-	buffer ->resize!(13) ->fill!(0, $$)
+	buffer ->resize!(13) ->fill!(0, @)
 
 	# consecutive call chain
 	var e = Employee
@@ -1166,7 +1210,7 @@ COVARIANCE  # @INC
 	show Employee('Peter Parker', 17, 'Photographer')
 	show Teacher('Diana Lane', 12, 'Biology')
 
-	var people = |Person|[Teacher(), Employee(), Employee(), Teacher()] # a covariant list.
+	var people = :Person[Teacher(), Employee(), Employee(), Teacher()] # a covariant list.
 
 IMPLICIT CONVERSION
 	# Dexter casts primitive between types implicitly.
@@ -1179,8 +1223,8 @@ TYPE CASTING
 	var radianInt = Int(2 * pi) # the resulting value Float of 2*pi is casted to Int.
 
 	# overloading a cast function.
-	func Employee(pers=Person):
-		Employee(pers.name, pers.age)
+	func Employee(~Person):
+		Employee(self->name, ->age)
 	..
 
 	var deitel = Person('Paul Deitel', 57)
@@ -1193,18 +1237,22 @@ TYPE CASTING
 	let cost = (MyInteger price) * qty
 
 NAME ALIASES
-	type Number as Integer|Float|Complex
-	func cheb as chebyshevCoefficient
-	let pi as thisIsAPiConstant
+	type Number = Integer|Float|Complex
+	func cheb <- chebyshevCoefficient
+	let pi = thisIsAPiConstant
 
 MODULES AND IMPORTS
-	import com.example.math pi, gcd, abs
+	import com.example.math(pi, gcd, abs)
 
 	import com.example.{(math pi, gcd, abs), (test scores, students)}
 
-	import com.example.math _
+	import com.example.math @
 
-	import com.example.math $vars, $lets, $enums
+	import com.example.math var, let, enum, type,
+
+	import com.example.math pi ! gcd, abs # this excludes the imort of gcd and abs
+
+	# global subjects and function subjects can only be passed by value from one module to another.
 
 GENERICS # @INC
 	func add(a & b & c = $T): # declaring a generic type T.
@@ -1220,15 +1268,16 @@ GENERICS # @INC
 	type MyList:
 		var list = |$T|[]
 
-	# a function can use the generic type of any of its parameters' types.
-	func append(ml = MyList, item = $T[ml]):
+	# a function can use the generic type of any of its first parameters' types.
+
+	func append(ml = MyList, item = $T of ml):
 		self.list += item
 
-	let parent = $S<:Bone # generic type S where S is a subtype of Bone.
+	let parent = $S(<:Bone) # generic type S where S is a subtype of Bone.
 
-	let identifier = $T=Str|Int # generic type T where T is either Str or Int.
+	let identifier = $T(Str|Int) # generic type T where T is either Str or Int.
 
-	var image = $U::Image{T} # generic type U is exactly Image{T}.
+	var image = $U(::Image{T}) # generic type U is exactly Image{T}.
 
 	func hello(msg = $T):
 		if T != Str:
@@ -1238,29 +1287,33 @@ GENERICS # @INC
 	..
 
 	var x = 10
-	let y = $[x] # this makes y have the same type as x
+	let y = $(x) # this makes y have the same type as x
+
+
+	func secToMin(int = Integer, sec = Float):
+		$(int) sec / 60
+	..
+
+	Int.secToMin sec:24.45
 
 TYPE OBJECTS # @INC
 	# unconventionally, Dexter has Type objects which can be held by subjects.
 	# Sometimes, this concept may clash with generics, but they are basically different
 	# constructs with overlapping features.
 
-	var number = Bool.type # covariant subject
+	var number = :Bool # covariant subject
 	# number can hold Bool.type or its subtypes.
 
 	# NOTE: the above expression returns a Type object
 	# The expression below doesn't. It is a placeholder for the requested type.
-	var number = $[Bool]
+	var number = $(Bool)
 
-	Int.type <: Integer.type
+	:Int <: :Integer # true
 
-	Int.type.type == Type
-
-	func secToMin(int = Integer.type, sec = Float):
-		$[int] sec / 60
+	func qux(x = :Integer, y = :Integer):
+		x :: y ? true || false
 	..
 
-	secToMin Int.type, sec:24.45
 
 ENUMS
 	# in a way, enums are types that contain declaration of subtypes.
@@ -1273,28 +1326,44 @@ ENUMS
 	# using allows an enum element to be used without the parent namespace.
 	# hiding disallows it. enum elements are using by default.
 	using Days
-	using Days: Sunday, Monday
+	using Days Sunday, Monday
 	hiding Days
 
 	func todo day = Days:
-		w:th Sunday$: sleep
-		with Monday$: work
-		with Friday$: tgif
+		w:th :Sunday: sleep
+		with :Monday: work
+		with :Friday: tgif
 	..
 
-	enum Number: IntegerNumber(i=Integer), RealNumber(r=Real)
+	enum Integral:
+		UnsignedIntegral(value = Unsigned)
+		SignedIntegral(value = Signed)
+	..
+
+	# enums can have field too, which enum elements inherit
+	enum Cars:
+		let make, model
+		Mustang
+		Ford
+	..
+
+	# enums can inherit from other enums and types.
+	# it's more of inclusion than inheritance
+	enum NewTools <: OldTools:
+		Unity
+		Django
+		SASS
+	..
 
 	# Algebraic Data Types
 	enum Tree:
-	    Empty
 	    Leaf value=Int
 	    Node left=Tree, right=Tree
 	..
 
 	func sum t = Tree:
-	    w:th Empty$: 0
-	    with Leaf$: t.value
-	    with Node$: sum(t.left) + sum(t.right)
+	    w:th :Leaf: t.value
+	    with :Node: sum(t.left) + sum(t.right)
 	..
 
 OPERATOR OVERLOADING # @INC
@@ -1318,61 +1387,80 @@ OPERATOR OVERLOADING # @INC
 	# indefinite characters
 	# these characters can only be used with other special characters of
 	# the same set to create new special identifier.
-	=, +, -, *, /, ^, √, &, |, >, <, =(special chars),
+	=, <-, +, -, *, /, ^, √, &, |, >, <, =(special chars),
 
 	# definite characters
 	# these group of characters cannot be overloaded as is, but can be combined
 	# to form new identifiers.
-	(special chars)=, ::, <:, >:, =::, =<:, =>:, >>, <<, ., <-, ~, =>, !
+	(special chars)=, ::, <:, >:, >>, <<, ., ~, =>, !
 
 	# language-level characters
 	# this group of characters cannot be overloaded nor can they be combined
 	# with other special characters to form new characters.
 	->, ,, ., $,
 
+	# due to their special use in the laguage, some spcial characters cannot be overloaded as a postfix or prefix.
+	/, |
+
 	# overloading special characters
 	@op{postfix, 20}
 	func ++(n = Number): t = n ; ++n ; t
 
 TRY, CATCH & ENSURE
-	# unlike most languages with error handling, Dexter's catch and ensure
-	# blocks are evaluated at the their location of a function.
-	# Named catch/ensure are called explicitly.
-
 	# try is optional
-	file->open->println({1:50})
+	file->open('banana.png')->println({1:50})
 	catch _(err = Err):
-		w:th FileNotFoundErr: printErr(err.msg)
-		with IndexOutOfBoundErr: printErr(err.msg)
+		w:th :FileNotFoundErr: printErr(err.msg)
+		with :IndexOutOfBoundErr: printErr(err.msg)
 	..
 
-	# try is optional, but if you need special handling of an error, try is needed
-	try:
-		process(bigData)
-	catch err = DivByZeroErr: # note this catch is note function, it's a statement
-		println err.msg
-	ensure:
+	# a catch function can only be defined after its call sites
+
+	process(bigData)`err
+	catch err divErr = DivByZeroErr:
+		println self.msg
+	ensure: # a catch can be accompanied by an ensure block.
 		rollBack(bigData)
 	..
 
 	# error coalescing
-	f ->open`ferr->write('Hello')->close`ferr
-	catch ferr(fnfe = FileNotFoundEx): println self.msg
-	ensure _: println('going out of scope')
+	f ->open('banana.png')`ferr->write('Hello')
+	catch ferr(fnfe = FileNotFoundErr): println self.msg
+	# after handling an error, the exec flow continues after the catch declaration.
+	# So it can be useful to redeclare a catch function.
+	f.open('banana.png')`ferr
+	# DO SOMETHING
+	catch ferr
+	# DO SOMETHING ELSE
+	catch ferr(fnfe = FileNotFoundErr): println self.msg
+	ensure: f.close
 
 	memory[name]`{0} # catch all
-	memory[name]`{KeyNotFoundEx|NoValueEx ? 0} # catch specific exceptions
+	memory[name]`{:KeyNotFoundErr|:NoValueErr: 0} # catch specific exceptions
 
 	try let f = open('/sdcard/db.sql'): # try's are used for managed resource
 		f.write(data)
 
+	# the normal try catch is supported
+	try:
+		f.open('banana.png')
+	catch ~FileNotFoundErr:
+		print self.msg
+
 	if num and den == 0:
-		throw DomainException() # throwing an exception.
+		raise DomainErr() # raising an exception.
 
 MACROS # @INC
-	# Dexter macros are resolved at pasre time.
-	var half = @reverseExpression 2 / 4
-	@assert num and den != 0
+	# Dexter macros are resolved at parse time.
+	macro reverseExpression(binExpr):
+		if isBinaryExpr binExpr:
+			binExpr->rhs, ->op, ->lhs
+		else:
+			raise "reverseExpression, needs binary argument"
+	..
+
+	var half = reverseExpression 2 / 4
+	assert num and den != 0
 
 
 OTHER LITERALS # @INC
@@ -1382,6 +1470,7 @@ OTHER LITERALS # @INC
 
 	var regex = /\d+(.\d+)?/ # regex.
 
+	# non-standard literals
 	var ns_number = 345_NGN
 	var ns_str = li.'1, 2, 3, 4'
 	var ns_list = li.[1, 2, 3, 5]
@@ -1393,7 +1482,7 @@ BUFFER TYPE
 	let int5 = Buffer{Int}(5)
 	# You can resize and also fill a buffer.
 	let buffer = Buffer{Int}(10, 10).fill!(0)
-	buffer ->resize!(1, 20) ->fill!(0, $$)
+	buffer ->resize!(1, 20) ->fill!(0, @)
 
 BASIC ARITHMETIC OPERATIONS
 	let t = 2 + 2
@@ -1401,8 +1490,8 @@ BASIC ARITHMETIC OPERATIONS
 	var v = 5 / 2 # this returns an F64 even though the operands are Ints
 	var w = 5 -/ 2 # this returns a clamped Int result of the above
 	var x = 6 % 5
-	let y = 5i16 ^ 2i8
-	let z = I8(2 .root 25)
+	let y = 5i16 ^ 2_i8
+	let z = I8(√25)
 
 INTEGER BITWISE FUNCTIONS
 	var x = 2 .bitand 5 # and
