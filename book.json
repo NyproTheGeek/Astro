@@ -1,0 +1,11 @@
+{
+    "gitbook": "2.x.x",
+    "root": "./docs",
+    "plugins": [],
+    "links": {
+        "sidebar": {
+            "Contact us": "smartnypro@outlook.com"
+        }
+    },
+    "pluginsConfig": {}
+}
