@@ -1,4 +1,4 @@
-# Dexter Programming Lanaguage
+# Dexter Programming Language
 DESCRIPTION
 Dexter is a statically-typed multi-paradigm language. 
 Dexter relies on multiple dispatch and UFCS to make OOP intuitive. 
