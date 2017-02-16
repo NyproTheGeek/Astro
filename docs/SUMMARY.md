@@ -12,8 +12,8 @@
     * [REPL Mode]()
     * [Running a Script]()
 * [Quick Examples](quick_examples/README.md)
-    * [Hello World]()
-    * [Fibonacci]()
+    * [Hello World](quick_examples/Hello_World.md)
+    * [Fibonacci](quick_examples/Fibonacci.md)
     * [Shapes and Areas]()
 
 ### SYNTAX AND SEMANTICS

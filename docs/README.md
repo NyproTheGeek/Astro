@@ -2,13 +2,13 @@
 description: This page introduces Dexter programming language.
 ---
 
-# The Dexter Book {#the-swift-book}
+# The Dexter Book {#the-dexter-book}
 
 Welcome to The Dexter Book. This book introduces the Dexter Programming Language.
 
 ## Who is this book for? {#who-is-this-book-for}
 
-This book is for those who want to learn how to write programs in Dexter. 
+This book is for those who want to learn how to write programs in Dexter.
 
 The goal of this book is to write the most up to date content for Dexter. You need a certain level of understanding of how a computer works.
 
@@ -33,4 +33,3 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Copyright \(c\) 2017 [github.com@dexterlang](https://www.github.com/nyprothegeek/dexter-programming-language)
-
